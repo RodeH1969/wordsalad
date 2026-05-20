@@ -1205,17 +1205,41 @@ function closeRules(){
 }
 
 // ── TICKER ─────────────────────────────────────────────────
-const TICKER_TEXT = '🎿 ALDI SNOW DROP ALERT ❄️ SAT 23 MAY ⛷️ CRANE SKI SPECIALS LIVE NOW  ✦  🟢 MEN'S PREMIUM SKI PANTS $79.99  ✦  🔵 WOMEN'S SNOWSUIT $79.99  ✦  🟣 WOMEN'S PREMIUM SKI PANTS $79.99  ✦  🔥 WOMEN'S THERMAL UNDERWEAR SET $29.99  ✦  🧤 MEN'S PREMIUM SKI GLOVES $34.99  ✦  🧤 WOMEN'S PREMIUM SKI GLOVES $34.99  ✦  🧤 PREMIUM SKI MITTENS $34.99  ✦  📱 TOUCHSCREEN GLOVES $9.99  ✦  🧦 CHILDREN'S SKI SOCKS $8.99  ✦  🧒 CHILDREN'S KNITTED ACCESSORIES $6.99  ✦  🧥 CHILDREN'S SNOW JACKET $39.99  ✦  👶 TODDLER SNOW SUIT $39.99  ✦  🏂 MEN'S SNOWBOARD JACKET $59.99  ✦  🎿 MEN'S SKI JACKET $59.99  ✦  🎿 WOMEN'S SKI JACKET $59.99  ✦  🧶 WOMEN'S FLEECE TOP $19.99  ✦  🐑 MEN'S MERINO THERMAL TOP $34.99  ✦  🐑 MEN'S MERINO THERMAL PANTS $34.99  ✦  ❄️ LIMITED STOCK • WHILE SUPPLIES LAST • SATURDAY SPECIAL BUYS ❄️  ✦  ';
+const TICKER_SEGMENTS = [
+  `🎿 ALDI SNOW DROP ALERT ❄️ SAT 23 MAY ⛷️ CRANE SKI SPECIALS LIVE NOW`,
+  `🟢 MENS PREMIUM SKI PANTS $79.99  ✦  🔵 WOMENS SNOWSUIT $79.99  ✦  🟣 WOMENS PREMIUM SKI PANTS $79.99  ✦  🔥 WOMENS THERMAL UNDERWEAR SET $29.99`,
+  `🧤 MENS PREMIUM SKI GLOVES $34.99  ✦  🧤 WOMENS PREMIUM SKI GLOVES $34.99  ✦  🧤 PREMIUM SKI MITTENS $34.99  ✦  📱 TOUCHSCREEN GLOVES $9.99`,
+  `🧦 CHILDRENS SKI SOCKS $8.99  ✦  🧒 CHILDRENS KNITTED ACCESSORIES $6.99  ✦  🧥 CHILDRENS SNOW JACKET $39.99  ✦  👶 TODDLER SNOW SUIT $39.99`,
+  `🏂 MENS SNOWBOARD JACKET $59.99  ✦  🎿 MENS SKI JACKET $59.99  ✦  🎿 WOMENS SKI JACKET $59.99  ✦  🧶 WOMENS FLEECE TOP $19.99`,
+  `🐑 MENS MERINO THERMAL TOP $34.99  ✦  🐑 MENS MERINO THERMAL PANTS $34.99  ✦  ❄️ LIMITED STOCK • WHILE SUPPLIES LAST • SATURDAY SPECIAL BUYS ❄️`,
+];
+
+function makeTickerContent(){
+  const frag = document.createDocumentFragment();
+  TICKER_SEGMENTS.forEach(seg => {
+    const txt = document.createElement('span');
+    txt.className = 'ticker-txt';
+    txt.textContent = '  ' + seg + '  ';
+    frag.appendChild(txt);
+    const img = document.createElement('img');
+    img.src = 'aldi.png';
+    img.className = 'ticker-logo';
+    img.alt = 'ALDI';
+    img.onerror = function(){ this.style.display='none'; };
+    frag.appendChild(img);
+  });
+  return frag;
+}
 
 function buildTicker(){
   const el=document.getElementById('ticker-track'); if(!el)return;
-  // Two SPAN copies — animation scrolls left by exactly 50% (one copy)
-  // so it loops perfectly with zero gap
-  const s1=document.createElement('span');
-  s1.className='ticker-txt'; s1.textContent=TICKER_TEXT;
-  const s2=document.createElement('span');
-  s2.className='ticker-txt'; s2.textContent=TICKER_TEXT;
-  el.appendChild(s1); el.appendChild(s2);
+  el.appendChild(makeTickerContent());
+  el.appendChild(makeTickerContent());
+}
+
+
+
+
 }
 buildTicker();
 
