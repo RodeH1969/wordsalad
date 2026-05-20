@@ -268,6 +268,83 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 @keyframes flashred{0%,100%{background:var(--bg3)}50%{background:#fee2e2}}
 .shake{animation:shake .35s ease;}
 .pop{animation:pop .15s ease;}
+
+/* ═══ TICKER ══════════════════════════════════════════════ */
+#ticker{
+  position:fixed;bottom:0;left:0;right:0;z-index:80;
+  height:38px;background:#111827;border-top:2px solid #374151;
+  overflow:hidden;display:flex;align-items:center;
+  flex-shrink:0;
+}
+.ticker-inner{
+  display:flex;align-items:center;white-space:nowrap;
+  animation:tickscroll 90s linear infinite;
+  will-change:transform;
+}
+.ticker-inner:hover{animation-play-state:paused;}
+@keyframes tickscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-txt{
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;
+  font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.75);
+  padding:0 8px;line-height:1;
+}
+.ticker-sep{color:#f97316;margin:0 4px;font-size:15px;}
+
+/* ═══ RULES BTN ═══════════════════════════════════════════ */
+#rules-btn{
+  position:fixed;top:10px;left:50%;transform:translateX(-50%);
+  z-index:70;background:#fff;border:2px solid var(--txt);
+  border-radius:20px;padding:5px 16px;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:var(--txt);
+  animation:ruleflash 2s ease-in-out infinite;
+  white-space:nowrap;
+}
+@keyframes ruleflash{0%,100%{border-color:var(--txt);color:var(--txt);box-shadow:none}
+  50%{border-color:var(--or);color:var(--or);box-shadow:0 0 0 3px rgba(249,115,22,.2)}}
+
+/* ═══ RULES POPUP ═════════════════════════════════════════ */
+#rules-popup{
+  position:fixed;inset:0;z-index:95;
+  background:rgba(0,0,0,.5);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;padding:16px;
+}
+#rules-popup.open{display:flex;}
+#rules-card{
+  background:#fff;border-radius:20px;
+  padding:24px 20px 20px;max-width:380px;width:100%;
+  max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  animation:popIn .35s cubic-bezier(.17,.67,.35,1.3);
+}
+.rules-title{
+  font-family:'Bebas Neue',sans-serif;font-size:32px;
+  letter-spacing:4px;color:var(--txt);text-align:center;
+  margin-bottom:16px;border-bottom:2px solid var(--border2);padding-bottom:12px;
+}
+.rule-item{
+  display:flex;gap:12px;align-items:flex-start;
+  margin-bottom:12px;padding-bottom:12px;
+  border-bottom:1px solid var(--border2);
+}
+.rule-item:last-of-type{border-bottom:none;margin-bottom:0;}
+.rule-icon{font-size:24px;flex-shrink:0;width:32px;text-align:center;}
+.rule-txt{flex:1;}
+.rule-head{
+  font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;
+  color:var(--txt);margin-bottom:2px;
+}
+.rule-body{font-size:12px;font-weight:600;color:var(--txt2);line-height:1.5;letter-spacing:.3px;}
+.rule-body b{color:var(--txt);}
+.rules-close{
+  width:100%;padding:12px;background:var(--txt);border:none;border-radius:12px;
+  color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;
+  cursor:pointer;margin-top:16px;
+}
+.rules-close:active{background:#374151;}
+/* countdown bar in rules */
+.rules-cdown{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--txt3);text-align:center;margin-top:10px;}
+#rules-bar{height:3px;background:var(--border2);border-radius:2px;margin-top:6px;overflow:hidden;}
+#rules-bar-fill{height:100%;background:var(--gr);border-radius:2px;width:100%;transition:width 20s linear;}
 </style>
 </head>
 <body>
@@ -377,6 +454,89 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 </div>
 
 <canvas id="fwc"></canvas>
+
+<!-- RULES BUTTON (visible on all game screens) -->
+<button id="rules-btn" onclick="openRules()">📋 RULES</button>
+
+<!-- RULES POPUP -->
+<div id="rules-popup">
+  <div id="rules-card">
+    <div class="rules-title">HOW TO PLAY</div>
+
+    <div class="rule-item">
+      <div class="rule-icon">🎯</div>
+      <div class="rule-txt">
+        <div class="rule-head">Use the Wheel Letters</div>
+        <div class="rule-body">Form words using only the letters in the outer ring. Each letter can only be used as many times as it appears on the wheel.</div>
+      </div>
+    </div>
+
+    <div class="rule-item">
+      <div class="rule-icon">⭕</div>
+      <div class="rule-txt">
+        <div class="rule-head">Centre Letter is Mandatory</div>
+        <div class="rule-body">Every word <b>must contain the centre letter H</b>. No exceptions — words without it are invalid.</div>
+      </div>
+    </div>
+
+    <div class="rule-item">
+      <div class="rule-icon">📏</div>
+      <div class="rule-txt">
+        <div class="rule-head">4 Letters Minimum</div>
+        <div class="rule-body">Words must be <b>4 or more letters</b> long. Short words don't count.</div>
+      </div>
+    </div>
+
+    <div class="rule-item">
+      <div class="rule-icon">📖</div>
+      <div class="rule-txt">
+        <div class="rule-head">Macquarie Dictionary Only</div>
+        <div class="rule-body">Words are checked against a standard English dictionary. Made-up words, proper nouns, and abbreviations are rejected.</div>
+      </div>
+    </div>
+
+    <div class="rule-item">
+      <div class="rule-icon">🚫</div>
+      <div class="rule-txt">
+        <div class="rule-head">No Plurals</div>
+        <div class="rule-body">If a word has already been played, its plural form is also <b>blocked</b>. No sneaky S on the end!</div>
+      </div>
+    </div>
+
+    <div class="rule-item">
+      <div class="rule-icon">⏱️</div>
+      <div class="rule-txt">
+        <div class="rule-head">40 Second Timer</div>
+        <div class="rule-body">You have <b>40 seconds</b> per turn. The bar and ring count down. At 10 seconds the alarm fires — get moving!</div>
+      </div>
+    </div>
+
+    <div class="rule-item">
+      <div class="rule-icon">🔄</div>
+      <div class="rule-txt">
+        <div class="rule-head">Taking Turns</div>
+        <div class="rule-body">Players alternate turns. <b>First round special rule:</b> if Player 1 fails or times out, Player 2 gets one chance to save themselves.</div>
+      </div>
+    </div>
+
+    <div class="rule-item">
+      <div class="rule-icon">🏆</div>
+      <div class="rule-txt">
+        <div class="rule-head">Last Player Standing Wins</div>
+        <div class="rule-body">The player who <b>makes an invalid word, uses a word already played, or runs out of time</b> loses. The other player wins!</div>
+      </div>
+    </div>
+
+    <div id="rules-bar"><div id="rules-bar-fill"></div></div>
+    <div class="rules-cdown" id="rules-cdown"></div>
+    <button class="rules-close" onclick="closeRules()">GOT IT — LET'S PLAY!</button>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div id="ticker">
+  <div class="ticker-inner" id="ticker-inner"></div>
+</div>
 
 <script>
 // ── FIREBASE ──────────────────────────────────────────────
@@ -531,8 +691,9 @@ window.addEventListener('load',()=>{
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const el=document.getElementById(id); if(el)el.classList.add('active');
-  const kb=document.getElementById('keyboard');
-  // keyboard is inside #game now — always visible when game is active
+  // Show rules button always except splash
+  const rb=document.getElementById('rules-btn');
+  if(rb)rb.style.display=id==='splash'?'none':'block';
 }
 
 // ── JOIN MODE LOBBY (invited player) ──────────────────────
@@ -555,6 +716,8 @@ function showLobbyJoinMode(code){
     joinBtn.style.marginTop='12px';
   }
   setLobMsg("Your friend is waiting — enter your name and JOIN! 👇");
+  // Show rules to invited player automatically
+  setTimeout(()=>openRules(true), 600);
 }
 
 // ── ROOM ──────────────────────────────────────────────────
@@ -927,6 +1090,41 @@ function shareResult(){
 }
 
 // ── RESET ─────────────────────────────────────────────────
+// ── RULES ─────────────────────────────────────────────────
+let rulesTimer=null, rulesCdown=null;
+function openRules(autoClose){
+  const p=document.getElementById('rules-popup'); if(!p)return;
+  p.classList.add('open');
+  const fill=document.getElementById('rules-bar-fill');
+  const cdown=document.getElementById('rules-cdown');
+  if(fill){fill.style.transition='none';fill.style.width='100%';
+    setTimeout(()=>{fill.style.transition='width 20s linear';fill.style.width='0%';},50);}
+  let s=20;
+  if(cdown)cdown.textContent='Auto-closing in '+s+'s...';
+  rulesCdown=setInterval(()=>{s--;if(s>0&&cdown)cdown.textContent='Auto-closing in '+s+'s...';else clearInterval(rulesCdown);},1000);
+  rulesTimer=setTimeout(()=>closeRules(),20000);
+}
+function closeRules(){
+  if(rulesTimer){clearTimeout(rulesTimer);rulesTimer=null;}
+  if(rulesCdown){clearInterval(rulesCdown);rulesCdown=null;}
+  const p=document.getElementById('rules-popup');if(p)p.classList.remove('open');
+  const fill=document.getElementById('rules-bar-fill');
+  if(fill){fill.style.transition='none';fill.style.width='100%';}
+}
+
+// ── TICKER ─────────────────────────────────────────────────
+const TICKER_TEXT = `🎿 ALDI SNOW DROP ALERT ❄️ SAT 23 MAY ⛷️ CRANE SKI SPECIALS LIVE NOW  ★  🟢 MEN'S PREMIUM SKI PANTS $79.99  ★  🔵 WOMEN'S SNOWSUIT $79.99  ★  🟣 WOMEN'S PREMIUM SKI PANTS $79.99  ★  🔥 WOMEN'S THERMAL UNDERWEAR SET $29.99  ★  🧤 MEN'S PREMIUM SKI GLOVES $34.99  ★  🧤 WOMEN'S PREMIUM SKI GLOVES $34.99  ★  🧤 PREMIUM SKI MITTENS $34.99  ★  📱 TOUCHSCREEN GLOVES $9.99  ★  🧦 CHILDREN'S SKI SOCKS $8.99  ★  🧒 CHILDREN'S KNITTED ACCESSORIES $6.99  ★  🧥 CHILDREN'S SNOW JACKET $39.99  ★  👶 TODDLER SNOW SUIT $39.99  ★  🏂 MEN'S SNOWBOARD JACKET $59.99  ★  🎿 MEN'S SKI JACKET $59.99  ★  🎿 WOMEN'S SKI JACKET $59.99  ★  🧶 WOMEN'S FLEECE TOP $19.99  ★  🐑 MEN'S MERINO THERMAL TOP $34.99  ★  🐑 MEN'S MERINO THERMAL PANTS $34.99  ★  ❄️ LIMITED STOCK • WHILE SUPPLIES LAST • SATURDAY SPECIAL BUYS ❄️  ★  `;
+function buildTicker(){
+  const el=document.getElementById('ticker-inner'); if(!el)return;
+  // Double it so scroll is seamless
+  el.innerHTML='<span class="ticker-txt">'+TICKER_TEXT+TICKER_TEXT+'</span>';
+}
+buildTicker();
+
+// ── ADJUST BODY PADDING FOR TICKER ────────────────────────
+// All screens need bottom padding so ticker doesn't cover content
+document.querySelectorAll('.screen').forEach(s=>s.style.paddingBottom='54px');
+
 function resetGame(){
   stopTimer(); listenersOn=false; kbBuilt=false;
   if(roomRef)roomRef.off();
