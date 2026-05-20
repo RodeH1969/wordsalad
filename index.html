@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>WORD SALAD</title>
+<title>WORDMUDDLE</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -387,14 +387,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 <!-- SPLASH -->
 <div id="splash" class="screen active">
   <svg id="spl-wheel" viewBox="0 0 240 240"></svg>
-  <div id="spl-title">WORD SALAD</div>
+  <img id="spl-logo" src="logo.png" alt="Wordmuddle" style="max-width:260px;width:70vw;height:auto;object-fit:contain;opacity:0;transition:opacity .5s ease .15s;" onerror="this.style.display='none';document.getElementById('spl-title').style.display='block'"/>
+  <div id="spl-title" style="display:none">WORDMUDDLE</div>
   <div id="spl-sub">HEAD TO HEAD · REAL TIME</div>
 </div>
 
 <!-- LOBBY -->
 <div id="lobby" class="screen">
-  <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:2px">
-    <div class="lob-title" style="margin-bottom:0">WORD SALAD</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:8px">
+    <img src="logo.png" alt="Wordmuddle" style="height:52px;width:auto;object-fit:contain;" onerror="this.style.display='none';document.getElementById('lob-title-fallback').style.display='block'"/>
+    <div id="lob-title-fallback" class="lob-title" style="margin-bottom:0;display:none">WORDMUDDLE</div>
     <button id="rules-btn-lobby" onclick="openRules()" style="background:#fff;border:2px solid #d1d5db;border-radius:20px;padding:4px 12px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#111827;animation:ruleflash 2s ease-in-out infinite;white-space:nowrap;flex-shrink:0;">📋 RULES</button>
   </div>
   <div class="lob-sub">HEAD TO HEAD · REAL TIME</div>
@@ -592,10 +594,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 // ── FIREBASE ──────────────────────────────────────────────
 const firebaseConfig={
   apiKey:"AIzaSyAJWQFKLGBHS77ZNrRm5EmfpaBIYb_hLmw",
-  authDomain:"wordsalad-b1a9c.firebaseapp.com",
-  databaseURL:"https://wordsalad-b1a9c-default-rtdb.firebaseio.com",
-  projectId:"wordsalad-b1a9c",
-  storageBucket:"wordsalad-b1a9c.firebasestorage.app",
+  authDomain:"wordmuddle-b1a9c.firebaseapp.com",
+  databaseURL:"https://wordmuddle-b1a9c-default-rtdb.firebaseio.com",
+  projectId:"wordmuddle-b1a9c",
+  storageBucket:"wordmuddle-b1a9c.firebasestorage.app",
   messagingSenderId:"185162364608",
   appId:"1:185162364608:web:a1b5bd1859d19ef81a1f25"
 };
@@ -746,8 +748,10 @@ window.addEventListener('load',()=>{
   const sp=document.getElementById('splash');
   setTimeout(()=>{
     document.getElementById('spl-wheel').style.opacity='1';
+    const logo=document.getElementById('spl-logo');
+    if(logo)logo.style.opacity='1';
     const t=document.getElementById('spl-title');
-    t.style.opacity='1';t.style.transform='scale(1)';
+    if(t&&t.style.display!=='none'){t.style.opacity='1';t.style.transform='scale(1)';}
   },100);
   setTimeout(()=>document.getElementById('spl-sub').style.opacity='1',400);
 
@@ -880,7 +884,7 @@ function updateGameUI(d){
   if(isMyTurn){
     banner.classList.add('myturn');
     if(btxt)btxt.textContent='⚡ YOUR TURN';
-    currentWord=[];renderStrip();
+    currentWord=[];renderStrip();resetKeyAvailability();
     setKeysLocked(true); // locked until popup dismissed
     // Show your turn popup with last word played
     const lastValid=(d.words||[]).filter(w=>w.valid).slice(-1)[0];
@@ -969,20 +973,59 @@ function mkKey(letter,centre,idx){
   const b=document.createElement('button');
   b.className='kb-key'+(centre?' ctr-key':'');
   b.textContent=letter; b.id='kk-'+idx;
-  b.addEventListener('click',()=>tapLetter(letter,centre));
+  // how many times this letter appears in the full pool
+  const total=POOL.filter(l=>l===letter).length;
+  b.dataset.total=total;
+  b.dataset.used=0;
+  b.addEventListener('click',()=>tapLetter(letter,centre,b));
   return b;
 }
-function tapLetter(letter,centre){
+function tapLetter(letter,centre,keyEl){
   if(!isMyTurn||isSubmitting||currentWord.length>=12)return;
+  // find first available key for this letter
+  let targetKey=keyEl;
+  if(!targetKey){
+    targetKey=[...document.querySelectorAll('.kb-key')].find(k=>k.textContent===letter&&parseInt(k.dataset.used||0)<parseInt(k.dataset.total||1));
+  }
+  if(!targetKey||parseInt(targetKey.dataset.used||0)>=parseInt(targetKey.dataset.total||1))return;
   sfxKeyTap();
-  currentWord.push({letter,centre}); renderStrip();
+  // mark this specific key slot as used
+  targetKey.dataset.used=parseInt(targetKey.dataset.used||0)+1;
+  updateKeyAppearance(targetKey);
+  currentWord.push({letter,centre,keyEl:targetKey}); renderStrip();
+  targetKey.classList.add('pop');
+  setTimeout(()=>targetKey.classList.remove('pop'),150);
+}
+function updateKeyAppearance(k){
+  const used=parseInt(k.dataset.used||0);
+  const total=parseInt(k.dataset.total||1);
+  if(used>=total){
+    k.classList.add('locked');
+    k.style.opacity='0.25';
+    k.style.background='#d1d5db';
+  } else {
+    k.classList.remove('locked');
+    k.style.opacity='1';
+    k.style.background='';
+  }
+}
+function resetKeyAvailability(){
   document.querySelectorAll('.kb-key').forEach(k=>{
-    if(k.textContent===letter){k.classList.add('pop');setTimeout(()=>k.classList.remove('pop'),150);}
+    k.dataset.used=0;
+    k.classList.remove('locked');
+    k.style.opacity='1';
+    k.style.background='';
   });
 }
 function deleteLetter(){
-  if(!isMyTurn||isSubmitting)return;
-  currentWord.pop(); renderStrip();
+  if(!isMyTurn||isSubmitting||currentWord.length===0)return;
+  const removed=currentWord.pop();
+  // restore the key that was used
+  if(removed&&removed.keyEl){
+    removed.keyEl.dataset.used=Math.max(0,parseInt(removed.keyEl.dataset.used||0)-1);
+    updateKeyAppearance(removed.keyEl);
+  }
+  renderStrip();
 }
 function renderStrip(){
   const s=document.getElementById('word-strip');
@@ -1170,14 +1213,14 @@ function launchFireworks(){
 // ── SHARE ─────────────────────────────────────────────────
 function shareRoom(){
   const url=`${location.origin}${location.pathname}#join=${roomId}`;
-  const text=`Hey! Come and play Word Salad with me 🥗🔤\n${url}`;
-  if(navigator.share)navigator.share({title:'Word Salad',text,url});
+  const text=`Hey! Come and play Wordmuddle with me 🥗🔤\n${url}`;
+  if(navigator.share)navigator.share({title:'Wordmuddle',text,url});
   else{navigator.clipboard?.writeText(text);alert('Copied! Send it to your opponent.');}
 }
 function shareResult(){
   const url=`${location.origin}${location.pathname}`;
-  const text=`Hey! Come and play Word Salad with me 🥗🔤\n${url}`;
-  if(navigator.share)navigator.share({title:'Word Salad',text,url});
+  const text=`Hey! Come and play Wordmuddle with me 🥗🔤\n${url}`;
+  if(navigator.share)navigator.share({title:'Wordmuddle',text,url});
   else{navigator.clipboard?.writeText(text);alert('Link copied!');}
 }
 
@@ -1268,6 +1311,7 @@ function showTurnPopup(lastWord, lastPlayer){
 function closeTurnPopup(){
   if(turnPopupTimer){clearTimeout(turnPopupTimer);turnPopupTimer=null;}
   const p=document.getElementById('turn-popup');if(p)p.classList.remove('open');
+  resetKeyAvailability();
   setKeysLocked(false);
   startTimer();
 }
@@ -1282,6 +1326,7 @@ function resetGame(){
   const jc=document.getElementById('join-code');if(jc)jc.value='';
   setLobMsg('');
   // rebuild keyboard rows on next game
+  resetKeyAvailability();
   const r1=document.getElementById('kb-r1');const r2=document.getElementById('kb-r2');
   if(r1)r1.innerHTML='';if(r2)r2.innerHTML='';
   showScreen('lobby');
