@@ -304,23 +304,28 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 /* ═══ TICKER ══════════════════════════════════════════════ */
 #ticker{
   position:fixed;bottom:0;left:0;right:0;z-index:80;
-  height:38px;background:#111827;border-top:2px solid #374151;
+  height:54px;background:#111827;border-top:3px solid #374151;
   overflow:hidden;display:flex;align-items:center;
-  flex-shrink:0;
 }
-.ticker-inner{
-  display:flex;align-items:center;white-space:nowrap;
-  animation:tickscroll 90s linear infinite;
+.ticker-track{
+  display:flex;align-items:center;
+  /* Two identical copies side by side — scroll left by exactly 50% = one copy width */
+  animation:tickscroll 120s linear infinite;
   will-change:transform;
+  /* width set by JS to 2x content */
 }
-.ticker-inner:hover{animation-play-state:paused;}
 @keyframes tickscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .ticker-txt{
-  font-family:'Barlow Condensed',sans-serif;font-size:13px;
-  font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.75);
-  padding:0 8px;line-height:1;
+  font-family:'Barlow Condensed',sans-serif;font-size:22px;
+  font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.9);
+  white-space:nowrap;padding:0 6px;line-height:1;
+  display:inline-flex;align-items:center;gap:0;
 }
-.ticker-sep{color:#f97316;margin:0 4px;font-size:15px;}
+.ticker-logo{
+  height:30px;width:auto;vertical-align:middle;
+  margin:0 14px;border-radius:4px;
+  display:inline-block;flex-shrink:0;
+}
 
 /* ═══ RULES BTN ═══════════════════════════════════════════ */
 #rules-btn{
@@ -520,7 +525,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
       <div class="rule-icon">⭕</div>
       <div class="rule-txt">
         <div class="rule-head">Centre Letter is Mandatory</div>
-        <div class="rule-body">Every word <b>must contain the centre letter H</b>. No exceptions — words without it are invalid.</div>
+        <div class="rule-body">Every word <b>must contain the centre letter</b> (the highlighted middle tile). No exceptions — words without it are invalid.</div>
       </div>
     </div>
 
@@ -580,7 +585,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 
 <!-- TICKER -->
 <div id="ticker">
-  <div class="ticker-inner" id="ticker-inner"></div>
+  <div class="ticker-track" id="ticker-track"></div>
 </div>
 
 <script>
@@ -598,9 +603,41 @@ firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
 
 // ── WHEEL ─────────────────────────────────────────────────
-const OUTER=['C','G','R','H','L','O','T','I','T'];
-const CENTRE='H';
-const POOL=[...OUTER,CENTRE];
+// 20 daily puzzles — rotates every day, cycles through all 20
+const PUZZLES=[
+  {centre:'H',outer:['C','G','R','H','L','O','T','I','T']},
+  {centre:'H',outer:['A','R','O','T','L','I','C','G','N']},
+  {centre:'E',outer:['A','R','T','L','I','C','D','N','S']},
+  {centre:'A',outer:['R','T','E','L','I','C','H','N','D']},
+  {centre:'O',outer:['R','T','A','L','I','C','H','N','S']},
+  {centre:'R',outer:['A','T','E','O','L','I','H','C','N']},
+  {centre:'T',outer:['A','R','E','O','L','I','H','C','N']},
+  {centre:'L',outer:['A','R','E','O','T','I','H','C','N']},
+  {centre:'C',outer:['A','R','E','O','T','L','I','H','N']},
+  {centre:'N',outer:['A','R','E','O','T','L','I','H','C']},
+  {centre:'I',outer:['A','R','E','O','T','L','C','H','N']},
+  {centre:'M',outer:['A','R','E','O','T','L','I','H','C']},
+  {centre:'D',outer:['A','R','E','O','T','L','I','H','N']},
+  {centre:'G',outer:['A','R','E','O','T','L','I','H','N']},
+  {centre:'B',outer:['A','R','E','O','T','L','I','H','N']},
+  {centre:'P',outer:['A','R','E','O','T','L','I','H','N']},
+  {centre:'U',outer:['A','R','E','O','T','L','I','H','N']},
+  {centre:'F',outer:['A','R','E','O','T','L','I','H','N']},
+  {centre:'Y',outer:['A','R','E','O','T','L','I','H','N']},
+  {centre:'V',outer:['A','R','E','O','T','L','I','H','N']},
+];
+
+function getDailyIdx(){
+  const d=new Date();
+  const start=new Date(d.getFullYear(),0,0);
+  const day=Math.floor((d-start)/86400000);
+  return day % PUZZLES.length;
+}
+
+const DAILY=PUZZLES[getDailyIdx()];
+let OUTER=[...DAILY.outer];
+let CENTRE=DAILY.centre;
+let POOL=[...OUTER,CENTRE];
 const TURNS=40;
 
 // ── STATE ─────────────────────────────────────────────────
@@ -776,10 +813,13 @@ async function createRoom(){
   myName=n;myId=uid();mySlot='p1';roomId=mkRoom();
   setLobMsg('Creating room...');
   roomRef=db.ref('rooms/'+roomId);
+  // store puzzle index so both players use the exact same wheel
+  const puzzleIdx = getDailyIdx();
   await roomRef.set({
     created:Date.now(),p1:{id:myId,name:myName},p2:null,
     status:'waiting',round:1,currentTurn:'p1',
-    firstRound:true,p1FailedFirst:false,words:[],loser:null
+    firstRound:true,p1FailedFirst:false,words:[],loser:null,
+    puzzleIdx: puzzleIdx
   });
   document.getElementById('wait-code').textContent=roomId;
   showScreen('waiting');
@@ -809,6 +849,11 @@ function listenRoom(){
     if(!snap.exists())return;
     const d=snap.val(); gameState=d;
     if(d.status==='playing'&&document.getElementById('waiting').classList.contains('active')){
+      // Sync puzzle from room data so both players see the same wheel
+      if(d.puzzleIdx !== undefined && PUZZLES[d.puzzleIdx]){
+        const p=PUZZLES[d.puzzleIdx];
+        OUTER=[...p.outer]; CENTRE=p.centre; POOL=[...OUTER,CENTRE];
+      }
       showScreen('game');
       drawWheel('wheel-svg',false);
       buildKeyboard();
@@ -1160,17 +1205,22 @@ function closeRules(){
 }
 
 // ── TICKER ─────────────────────────────────────────────────
-const TICKER_TEXT = `🎿 ALDI SNOW DROP ALERT ❄️ SAT 23 MAY ⛷️ CRANE SKI SPECIALS LIVE NOW  ★  🟢 MEN'S PREMIUM SKI PANTS $79.99  ★  🔵 WOMEN'S SNOWSUIT $79.99  ★  🟣 WOMEN'S PREMIUM SKI PANTS $79.99  ★  🔥 WOMEN'S THERMAL UNDERWEAR SET $29.99  ★  🧤 MEN'S PREMIUM SKI GLOVES $34.99  ★  🧤 WOMEN'S PREMIUM SKI GLOVES $34.99  ★  🧤 PREMIUM SKI MITTENS $34.99  ★  📱 TOUCHSCREEN GLOVES $9.99  ★  🧦 CHILDREN'S SKI SOCKS $8.99  ★  🧒 CHILDREN'S KNITTED ACCESSORIES $6.99  ★  🧥 CHILDREN'S SNOW JACKET $39.99  ★  👶 TODDLER SNOW SUIT $39.99  ★  🏂 MEN'S SNOWBOARD JACKET $59.99  ★  🎿 MEN'S SKI JACKET $59.99  ★  🎿 WOMEN'S SKI JACKET $59.99  ★  🧶 WOMEN'S FLEECE TOP $19.99  ★  🐑 MEN'S MERINO THERMAL TOP $34.99  ★  🐑 MEN'S MERINO THERMAL PANTS $34.99  ★  ❄️ LIMITED STOCK • WHILE SUPPLIES LAST • SATURDAY SPECIAL BUYS ❄️  ★  `;
+const TICKER_TEXT = '🎿 ALDI SNOW DROP ALERT ❄️ SAT 23 MAY ⛷️ CRANE SKI SPECIALS LIVE NOW  ✦  🟢 MEN'S PREMIUM SKI PANTS $79.99  ✦  🔵 WOMEN'S SNOWSUIT $79.99  ✦  🟣 WOMEN'S PREMIUM SKI PANTS $79.99  ✦  🔥 WOMEN'S THERMAL UNDERWEAR SET $29.99  ✦  🧤 MEN'S PREMIUM SKI GLOVES $34.99  ✦  🧤 WOMEN'S PREMIUM SKI GLOVES $34.99  ✦  🧤 PREMIUM SKI MITTENS $34.99  ✦  📱 TOUCHSCREEN GLOVES $9.99  ✦  🧦 CHILDREN'S SKI SOCKS $8.99  ✦  🧒 CHILDREN'S KNITTED ACCESSORIES $6.99  ✦  🧥 CHILDREN'S SNOW JACKET $39.99  ✦  👶 TODDLER SNOW SUIT $39.99  ✦  🏂 MEN'S SNOWBOARD JACKET $59.99  ✦  🎿 MEN'S SKI JACKET $59.99  ✦  🎿 WOMEN'S SKI JACKET $59.99  ✦  🧶 WOMEN'S FLEECE TOP $19.99  ✦  🐑 MEN'S MERINO THERMAL TOP $34.99  ✦  🐑 MEN'S MERINO THERMAL PANTS $34.99  ✦  ❄️ LIMITED STOCK • WHILE SUPPLIES LAST • SATURDAY SPECIAL BUYS ❄️  ✦  ';
+
 function buildTicker(){
-  const el=document.getElementById('ticker-inner'); if(!el)return;
-  // Double it so scroll is seamless
-  el.innerHTML='<span class="ticker-txt">'+TICKER_TEXT+TICKER_TEXT+'</span>';
+  const el=document.getElementById('ticker-track'); if(!el)return;
+  // Two SPAN copies — animation scrolls left by exactly 50% (one copy)
+  // so it loops perfectly with zero gap
+  const s1=document.createElement('span');
+  s1.className='ticker-txt'; s1.textContent=TICKER_TEXT;
+  const s2=document.createElement('span');
+  s2.className='ticker-txt'; s2.textContent=TICKER_TEXT;
+  el.appendChild(s1); el.appendChild(s2);
 }
 buildTicker();
 
 // ── ADJUST BODY PADDING FOR TICKER ────────────────────────
-// All screens need bottom padding so ticker doesn't cover content
-document.querySelectorAll('.screen').forEach(s=>s.style.paddingBottom='54px');
+document.querySelectorAll('.screen').forEach(s=>s.style.paddingBottom='68px');
 
 // ── YOUR TURN POPUP ───────────────────────────────────────
 let turnPopupTimer=null;
@@ -1182,10 +1232,10 @@ function showTurnPopup(lastWord, lastPlayer){
   if(lastWord){
     if(pw)pw.style.display='block';
     if(pv)pv.textContent=lastWord;
-    if(hint)hint.innerHTML=`<b>${lastPlayer||'They'}</b> just played <b>${lastWord}</b>.<br>Pick a different word using the wheel.<br>Must contain <b>H</b> · 4+ letters · No plurals`;
+    if(hint)hint.innerHTML=`<b>${lastPlayer||'They'}</b> just played <b>${lastWord}</b>.<br>Pick a different word using the wheel.<br>Must contain <b>${CENTRE}</b> · 4+ letters · No plurals`;
   } else {
     if(pw)pw.style.display='none';
-    if(hint)hint.innerHTML=`You go first!<br>Pick a word using the wheel letters.<br>Must contain <b>H</b> · 4+ letters · No plurals`;
+    if(hint)hint.innerHTML=`You go first!<br>Pick a word using the wheel letters.<br>Must contain <b>${CENTRE}</b> · 4+ letters · No plurals`;
   }
   p.classList.add('open');
   // auto-dismiss after 4 seconds
