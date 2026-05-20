@@ -44,8 +44,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
   color:var(--txt3);margin-top:6px;
   opacity:0;transition:opacity .5s ease .3s;
 }
-#spl-wheel{width:clamp(120px,35vw,160px);height:clamp(120px,35vw,160px);
-  margin-bottom:16px;opacity:0;transition:opacity .5s ease .1s;}
+
 
 /* ═══ LOBBY ═══════════════════════════════════════════════ */
 #lobby{gap:10px;max-width:400px;width:100%;margin:0 auto;justify-content:center;}
@@ -386,10 +385,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 
 <!-- SPLASH -->
 <div id="splash" class="screen active">
-  <svg id="spl-wheel" viewBox="0 0 240 240"></svg>
-  <img id="spl-logo" src="logo.png" alt="Wordmuddle" style="max-width:260px;width:70vw;height:auto;object-fit:contain;opacity:0;transition:opacity .5s ease .15s;" onerror="this.style.display='none';document.getElementById('spl-title').style.display='block'"/>
-  <div id="spl-title" style="display:none">WORDMUDDLE</div>
-  <div id="spl-sub">HEAD TO HEAD · REAL TIME</div>
+  <img id="spl-logo" src="logo.png" alt="Wordmuddle" style="max-width:340px;width:85vw;height:auto;object-fit:contain;opacity:0;transition:opacity .6s ease .1s;" onerror="this.style.display='none';document.getElementById('spl-title').style.display='block'"/>
+  <div id="spl-title" style="display:none;font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:6px;color:#111827;">WORDMUDDLE</div>
+  <div id="spl-sub" style="margin-top:12px">HEAD TO HEAD · REAL TIME</div>
 </div>
 
 <!-- LOBBY -->
@@ -744,10 +742,9 @@ function drawWheel(svgId,sm){
 
 // ── SPLASH ────────────────────────────────────────────────
 window.addEventListener('load',()=>{
-  drawWheel('spl-wheel',true);
+  // splash wheel removed
   const sp=document.getElementById('splash');
   setTimeout(()=>{
-    document.getElementById('spl-wheel').style.opacity='1';
     const logo=document.getElementById('spl-logo');
     if(logo)logo.style.opacity='1';
     const t=document.getElementById('spl-title');
