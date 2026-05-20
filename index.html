@@ -326,6 +326,23 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
   display:inline-block;flex-shrink:0;
 }
 
+/* ═══ MODE CARDS ══════════════════════════════════════════ */
+.mode-card{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  background:#fff;border:2px solid var(--border2);border-radius:16px;
+  padding:14px 16px;cursor:pointer;transition:all .15s;
+}
+.mode-card:active{transform:scale(.98);border-color:var(--gr);}
+.mode-card-left{display:flex;align-items:center;gap:12px;}
+.mode-icon{font-size:28px;flex-shrink:0;}
+.mode-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:#111827;line-height:1.1;}
+.mode-sub{font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.5px;margin-top:2px;}
+.mode-arrow{font-size:16px;color:#d1d5db;}
+#daily-card{border-color:#bbf7d0;background:#f0fdf4;}
+#daily-card .mode-arrow{color:#6aaa64;}
+#challenge-card{border-color:#fed7aa;background:#fff7ed;}
+#challenge-card .mode-arrow{color:#f97316;}
+
 /* ═══ RULES BTN ═══════════════════════════════════════════ */
 #rules-btn{
   background:#fff;border:2px solid var(--border);
@@ -392,25 +409,77 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 
 <!-- LOBBY -->
 <div id="lobby" class="screen">
-  <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:8px">
-    <img src="logo.png" alt="Wordmuddle" style="height:52px;width:auto;object-fit:contain;" onerror="this.style.display='none';document.getElementById('lob-title-fallback').style.display='block'"/>
+  <!-- header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;width:100%;max-width:400px;margin-bottom:6px">
+    <img src="logo.png" alt="Wordmuddle" style="height:48px;width:auto;object-fit:contain;" onerror="this.style.display='none';document.getElementById('lob-title-fallback').style.display='block'"/>
     <div id="lob-title-fallback" class="lob-title" style="margin-bottom:0;display:none">WORDMUDDLE</div>
     <button id="rules-btn-lobby" onclick="openRules()" style="background:#fff;border:2px solid #d1d5db;border-radius:20px;padding:4px 12px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#111827;animation:ruleflash 2s ease-in-out infinite;white-space:nowrap;flex-shrink:0;">📋 RULES</button>
   </div>
-  <div class="lob-sub">HEAD TO HEAD · REAL TIME</div>
-  <div style="width:100%;margin-bottom:10px">
+
+  <!-- name field -->
+  <div style="width:100%;max-width:400px;margin-bottom:12px">
     <span class="lbl">YOUR NAME</span>
     <input id="player-name" class="inp" type="text" placeholder="Enter your name" maxlength="16" autocomplete="off"/>
   </div>
-  <div id="create-section"><button class="btn-or" onclick="createRoom()">CREATE ROOM</button></div>
-  <div id="div-section" class="divrow" style="width:100%;margin:10px 0">
-    <div class="divline"></div><div class="divtxt">OR JOIN</div><div class="divline"></div>
+
+  <!-- MODE CARDS -->
+  <div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px;">
+
+    <!-- DAILY SOLO -->
+    <div class="mode-card" id="daily-card" onclick="playDaily()">
+      <div class="mode-card-left">
+        <div class="mode-icon">📅</div>
+        <div>
+          <div class="mode-title">TODAY'S PUZZLE</div>
+          <div class="mode-sub" id="daily-info-txt">Loading...</div>
+        </div>
+      </div>
+      <div class="mode-arrow">▶</div>
+    </div>
+
+    <!-- CHALLENGE -->
+    <div class="mode-card" id="challenge-card" onclick="showChallengePanel()">
+      <div class="mode-card-left">
+        <div class="mode-icon">⚡</div>
+        <div>
+          <div class="mode-title">CHALLENGE SOMEONE</div>
+          <div class="mode-sub">Random puzzle · Head to head</div>
+        </div>
+      </div>
+      <div class="mode-arrow">▶</div>
+    </div>
+
+    <!-- JOIN panel (hidden by default) -->
+    <div id="join-panel" style="display:none;flex-direction:column;gap:8px;">
+      <div class="divrow" style="width:100%">
+        <div class="divline"></div><div class="divtxt">HAVE A CODE?</div><div class="divline"></div>
+      </div>
+      <div id="join-section" class="join-row">
+        <input id="join-code" class="inp" type="text" placeholder="Room code" maxlength="6" style="text-transform:uppercase;letter-spacing:4px" autocomplete="off"/>
+        <button id="join-main-btn" class="btn-join" onclick="joinRoom()">JOIN</button>
+      </div>
+    </div>
+
   </div>
-  <div id="join-section" class="join-row" style="width:100%">
-    <input id="join-code" class="inp" type="text" placeholder="Room code" maxlength="6" style="text-transform:uppercase;letter-spacing:4px" autocomplete="off"/>
-    <button id="join-main-btn" class="btn-join" onclick="joinRoom()">JOIN</button>
+
+  <div id="lob-msg" style="margin-top:8px;max-width:400px;width:100%"></div>
+</div>
+
+<!-- CHALLENGE PANEL (slide-up) -->
+<div id="challenge-panel" style="display:none;position:fixed;inset:0;z-index:75;background:rgba(0,0,0,.5);align-items:flex-end;justify-content:center;">
+  <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#111827;margin-bottom:4px;">CHALLENGE</div>
+    <div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:16px;letter-spacing:.5px;">Create a room and invite a friend — or join theirs</div>
+    <button class="btn-or" style="margin-bottom:10px;" onclick="createRoom()">CREATE ROOM &amp; INVITE</button>
+    <div class="divrow" style="width:100%;margin-bottom:10px">
+      <div class="divline"></div><div class="divtxt">OR JOIN THEIRS</div><div class="divline"></div>
+    </div>
+    <div class="join-row" style="margin-bottom:16px;">
+      <input id="join-code-panel" class="inp" type="text" placeholder="Room code" maxlength="6" style="text-transform:uppercase;letter-spacing:4px" autocomplete="off"/>
+      <button class="btn-join" onclick="joinRoomFromPanel()">JOIN</button>
+    </div>
+    <button onclick="closeChallengePanel()" style="width:100%;padding:10px;background:transparent;border:1.5px solid #d1d5db;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#6b7280;cursor:pointer;">CANCEL</button>
   </div>
-  <div id="lob-msg" style="margin-top:8px"></div>
 </div>
 
 <!-- WAITING -->
@@ -627,18 +696,29 @@ const PUZZLES=[
   {centre:'V',outer:['A','R','E','O','T','L','I','H','N']},
 ];
 
-function getDailyIdx(){
-  const d=new Date();
-  const start=new Date(d.getFullYear(),0,0);
-  const day=Math.floor((d-start)/86400000);
-  return day % PUZZLES.length;
-}
-
-const DAILY=PUZZLES[getDailyIdx()];
-let OUTER=[...DAILY.outer];
-let CENTRE=DAILY.centre;
+// Start with puzzle 0 as default — overwritten when room syncs
+let OUTER=[...PUZZLES[0].outer];
+let CENTRE=PUZZLES[0].centre;
 let POOL=[...OUTER,CENTRE];
 const TURNS=40;
+
+function applyPuzzle(idx){
+  const p=PUZZLES[idx]||PUZZLES[0];
+  OUTER=[...p.outer]; CENTRE=p.centre; POOL=[...OUTER,CENTRE];
+}
+
+function getDailyInfo(){
+  const now=new Date();
+  const start=new Date(now.getFullYear(),0,0);
+  const dayOfYear=Math.floor((now-start)/86400000);
+  // Game number: count days since Jan 1 2025 (launch date)
+  const launch=new Date(2025,0,1);
+  const gameNum=Math.floor((now-launch)/86400000)+1;
+  const puzzleIdx=dayOfYear % PUZZLES.length;
+  const months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const dateStr=now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+  return { gameNum, puzzleIdx, dateStr };
+}
 
 // ── STATE ─────────────────────────────────────────────────
 let myId='',myName='',mySlot=null,roomId=null,roomRef=null;
@@ -766,6 +846,7 @@ window.addEventListener('load',()=>{
       } else {
         showScreen('lobby');
       }
+      initLobby();
     },500);
   },2000);
 });
@@ -814,8 +895,8 @@ async function createRoom(){
   myName=n;myId=uid();mySlot='p1';roomId=mkRoom();
   setLobMsg('Creating room...');
   roomRef=db.ref('rooms/'+roomId);
-  // store puzzle index so both players use the exact same wheel
-  const puzzleIdx = getDailyIdx();
+  // random puzzle — fair since neither player has seen it yet
+  const puzzleIdx = Math.floor(Math.random() * PUZZLES.length);
   await roomRef.set({
     created:Date.now(),p1:{id:myId,name:myName},p2:null,
     status:'waiting',round:1,currentTurn:'p1',
@@ -850,11 +931,8 @@ function listenRoom(){
     if(!snap.exists())return;
     const d=snap.val(); gameState=d;
     if(d.status==='playing'&&document.getElementById('waiting').classList.contains('active')){
-      // Sync puzzle from room data so both players see the same wheel
-      if(d.puzzleIdx !== undefined && PUZZLES[d.puzzleIdx]){
-        const p=PUZZLES[d.puzzleIdx];
-        OUTER=[...p.outer]; CENTRE=p.centre; POOL=[...OUTER,CENTRE];
-      }
+      // Both players load the same random puzzle from room data
+      if(d.puzzleIdx !== undefined) applyPuzzle(d.puzzleIdx);
       showScreen('game');
       drawWheel('wheel-svg',false);
       buildKeyboard();
@@ -1106,11 +1184,34 @@ function setMsg(txt,cls){
 }
 
 async function recordSuccess(word){
+  if(soloMode){
+    // Solo mode — just track locally
+    if(!gameState)gameState={words:[],round:1};
+    gameState.words=[...gameState.words,{word,valid:true,player:myName,slot:'p1'}];
+    gameState.round=(gameState.round||1)+1;
+    renderHistory(gameState.words);
+    const uc=document.getElementById('used-count');
+    if(uc)uc.textContent=gameState.words.filter(w=>w.valid).length;
+    const rn=document.getElementById('round-num');
+    if(rn)rn.textContent=gameState.round;
+    currentWord=[];renderStrip();resetKeyAvailability();
+    setMsg('✓ '+word,'mok');
+    isSubmitting=false;
+    return;
+  }
   const words=[...(gameState.words||[]),{word,valid:true,player:myName,slot:mySlot}];
   const next=mySlot==='p1'?'p2':'p1';
   await roomRef.update({words,currentTurn:next,round:(gameState.round||1)+1,firstRound:false});
 }
 async function recordFailure(word){
+  if(soloMode){
+    if(!gameState)gameState={words:[]};
+    gameState.words=[...gameState.words,{word,valid:false,player:myName,slot:'p1'}];
+    renderHistory(gameState.words);
+    setMsg('❌ '+word,'merr');
+    isSubmitting=false;
+    return;
+  }
   const words=[...(gameState.words||[]),{word,valid:false,player:myName,slot:mySlot}];
   if(gameState.firstRound&&mySlot==='p1'&&!gameState.p1FailedFirst){
     await roomRef.update({words,currentTurn:'p2',p1FailedFirst:true});
@@ -1210,18 +1311,85 @@ function launchFireworks(){
 // ── SHARE ─────────────────────────────────────────────────
 function shareRoom(){
   const url=`${location.origin}${location.pathname}#join=${roomId}`;
-  const text=`Hey! Come and play Wordmuddle with me 🥗🔤\n${url}`;
+  const text=`Hey! Come and play Wordmuddle with me 🟩🔤\n${url}`;
   if(navigator.share)navigator.share({title:'Wordmuddle',text,url});
   else{navigator.clipboard?.writeText(text);alert('Copied! Send it to your opponent.');}
 }
 function shareResult(){
   const url=`${location.origin}${location.pathname}`;
-  const text=`Hey! Come and play Wordmuddle with me 🥗🔤\n${url}`;
+  const iWon=soloMode?true:(gameState&&gameState.loser!==mySlot);
+  const validCount=(gameState?.words||[]).filter(w=>w.valid&&w.slot===mySlot).length;
+  const info=getDailyInfo();
+  const resultEmoji=soloMode?'🟩':iWon?'🏆':'💀';
+  const msg=soloMode?`I found ${validCount} word${validCount!==1?'s':''} in today's Wordmuddle! Game #${info.gameNum} · ${info.dateStr} 🔤\nCan you beat me?`:`${resultEmoji} I played Wordmuddle and ${iWon?'WON':'lost'} with ${validCount} word${validCount!==1?'s':''} 🔤\nThink you can beat me?`;
+  const text=`${msg}\n${url}`;
   if(navigator.share)navigator.share({title:'Wordmuddle',text,url});
   else{navigator.clipboard?.writeText(text);alert('Link copied!');}
 }
 
 // ── RESET ─────────────────────────────────────────────────
+// ── LOBBY SETUP ───────────────────────────────────────────
+function initLobby(){
+  const info=getDailyInfo();
+  const el=document.getElementById('daily-info-txt');
+  if(el)el.textContent=`Game #${info.gameNum} · ${info.dateStr}`;
+  // If URL has join code, show challenge panel open
+  const hashCode=(location.hash||'').replace('#join=','').replace('#','').trim().toUpperCase();
+  const qCode=new URLSearchParams(location.search).get('join')||'';
+  const autoJoin=(hashCode||qCode)||null;
+  if(autoJoin) showLobbyJoinMode(autoJoin);
+}
+
+let soloMode=false;
+function playDaily(){
+  const name=document.getElementById('player-name').value.trim();
+  if(!name){setLobMsg('Enter your name first');return;}
+  myName=name; myId=uid(); mySlot='p1'; soloMode=true;
+  const info=getDailyInfo();
+  applyPuzzle(info.puzzleIdx);
+  showScreen('game');
+  drawWheel('wheel-svg',false);
+  buildKeyboard();
+  sfxGameStart();
+  isMyTurn=true;
+  // Set up solo UI
+  const banner=document.getElementById('g-banner');
+  const btxt=document.getElementById('g-btxt');
+  const rn=document.getElementById('round-num');
+  const uc=document.getElementById('used-count');
+  if(banner)banner.classList.add('myturn');
+  if(btxt)btxt.textContent=`⚡ GAME #${info.gameNum} · ${info.dateStr}`;
+  if(rn)rn.textContent='1';
+  if(uc)uc.textContent='0';
+  currentWord=[];renderStrip();resetKeyAvailability();
+  setKeysLocked(false);
+  // Solo: just show the wheel, player practices — no timer, no opponent
+  const timerWrap=document.querySelector('.timer-ring');
+  const bbar=document.getElementById('bbar');
+  if(timerWrap)timerWrap.style.visibility='hidden';
+  if(bbar)bbar.style.display='none';
+  showTurnPopup(null,null);
+}
+
+function showChallengePanel(){
+  const name=document.getElementById('player-name').value.trim();
+  if(!name){setLobMsg('Enter your name first');return;}
+  const p=document.getElementById('challenge-panel');
+  if(p)p.style.display='flex';
+}
+function closeChallengePanel(){
+  const p=document.getElementById('challenge-panel');
+  if(p)p.style.display='none';
+}
+function joinRoomFromPanel(){
+  // copy code from panel input to main join-code input and join
+  const panelInput=document.getElementById('join-code-panel');
+  const mainInput=document.getElementById('join-code');
+  if(panelInput&&mainInput)mainInput.value=panelInput.value;
+  closeChallengePanel();
+  joinRoom();
+}
+
 // ── RULES ─────────────────────────────────────────────────
 let rulesTimer=null, rulesCdown=null;
 function openRules(autoClose){
@@ -1317,7 +1485,11 @@ function resetGame(){
   stopTimer(); listenersOn=false; kbBuilt=false;
   if(roomRef)roomRef.off();
   roomRef=null;roomId=null;mySlot=null;gameState=null;
-  currentWord=[];isSubmitting=false;isMyTurn=false;pendingEndData=null;
+  currentWord=[];isSubmitting=false;isMyTurn=false;pendingEndData=null;soloMode=false;
+  const timerWrap=document.querySelector('.timer-ring');
+  const bbar=document.getElementById('bbar');
+  if(timerWrap)timerWrap.style.visibility='visible';
+  if(bbar)bbar.style.display='block';
   document.getElementById('g-history').innerHTML='';
   const pn=document.getElementById('player-name');if(pn)pn.value='';
   const jc=document.getElementById('join-code');if(jc)jc.value='';
