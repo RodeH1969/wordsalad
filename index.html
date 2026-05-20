@@ -299,13 +299,13 @@ html,body{height:100%;overflow:hidden;background:var(--dk);color:#fff;
     <span class="lbl">YOUR NAME</span>
     <input id="player-name" class="inp" type="text" placeholder="Enter your name" maxlength="16" autocomplete="off"/>
   </div>
-  <button class="btn-or" onclick="createRoom()">CREATE ROOM</button>
-  <div class="divrow" style="width:100%;margin:10px 0">
+  <div id="create-section"><button class="btn-or" onclick="createRoom()">CREATE ROOM</button></div>
+  <div id="div-section" class="divrow" style="width:100%;margin:10px 0">
     <div class="divline"></div><div class="divtxt">OR JOIN</div><div class="divline"></div>
   </div>
-  <div class="join-row" style="width:100%">
+  <div id="join-section" class="join-row" style="width:100%">
     <input id="join-code" class="inp" type="text" placeholder="Room code" maxlength="6" style="text-transform:uppercase;letter-spacing:4px" autocomplete="off"/>
-    <button class="btn-join" onclick="joinRoom()">JOIN</button>
+    <button id="join-main-btn" class="btn-join" onclick="joinRoom()">JOIN</button>
   </div>
   <div id="lob-msg" style="margin-top:8px"></div>
 </div>
@@ -419,7 +419,23 @@ let pendingEndData=null;
 // ── AUDIO ENGINE ──────────────────────────────────────────
 const AC=window.AudioContext||window.webkitAudioContext;
 let ac=null;
-function getAC(){if(!ac){try{ac=new AC();}catch(e){}}return ac;}
+let acUnlocked=false;
+function getAC(){
+  if(!ac){try{ac=new AC();}catch(e){return null;}}
+  // Resume if suspended (browser autoplay policy)
+  if(ac.state==='suspended')ac.resume();
+  return ac;
+}
+// Unlock audio on very first touch/click
+function unlockAudio(){
+  if(acUnlocked)return; acUnlocked=true;
+  const a=getAC(); if(!a)return;
+  const b=a.createOscillator(),g=a.createGain();
+  b.connect(g);g.connect(a.destination);
+  g.gain.value=0.001; b.start(0); b.stop(0.01);
+}
+document.addEventListener('touchstart',unlockAudio,{once:true,passive:true});
+document.addEventListener('mousedown',unlockAudio,{once:true,passive:true});
 
 function beep(freq,dur,type='square',vol=0.15,delay=0){
   const a=getAC(); if(!a)return;
@@ -505,18 +521,19 @@ window.addEventListener('load',()=>{
   },100);
   setTimeout(()=>document.getElementById('spl-sub').style.opacity='1',400);
 
-  // check URL for auto-join code
-  const params=new URLSearchParams(location.search);
-  const autoJoin=params.get('join');
+  // check URL hash OR query param for auto-join code
+  const hashCode=(location.hash||'').replace('#join=','').replace('#','').trim().toUpperCase();
+  const qCode=new URLSearchParams(location.search).get('join')||'';
+  const autoJoin=(hashCode||qCode).toUpperCase()||null;
 
   setTimeout(()=>{
     sp.classList.add('out');
     setTimeout(()=>{
       sp.style.display='none';
-      showScreen('lobby');
       if(autoJoin){
-        document.getElementById('join-code').value=autoJoin.toUpperCase();
-        document.getElementById('lob-msg').textContent='Room code pre-filled — enter your name and JOIN!';
+        showLobbyJoinMode(autoJoin);
+      } else {
+        showScreen('lobby');
       }
     },500);
   },2000);
@@ -528,6 +545,28 @@ function showScreen(id){
   const el=document.getElementById(id); if(el)el.classList.add('active');
   const kb=document.getElementById('keyboard');
   // keyboard is inside #game now — always visible when game is active
+}
+
+// ── JOIN MODE LOBBY (invited player) ──────────────────────
+function showLobbyJoinMode(code){
+  showScreen('lobby');
+  // Pre-fill code
+  const jc=document.getElementById('join-code');
+  if(jc)jc.value=code;
+  // Hide create room section, show only join UI
+  const createSection=document.getElementById('create-section');
+  const divSection=document.getElementById('div-section');
+  const joinSection=document.getElementById('join-section');
+  const joinBtn=document.getElementById('join-main-btn');
+  if(createSection)createSection.style.display='none';
+  if(divSection)divSection.style.display='none';
+  // Make join button pulse pink
+  if(joinBtn){
+    joinBtn.className='btn-pink';
+    joinBtn.style.width='100%';
+    joinBtn.style.marginTop='12px';
+  }
+  setLobMsg("Your friend is waiting — enter your name and JOIN! 👇");
 }
 
 // ── ROOM ──────────────────────────────────────────────────
@@ -887,7 +926,7 @@ function launchFireworks(){
 
 // ── SHARE ─────────────────────────────────────────────────
 function shareRoom(){
-  const url=`${location.origin}${location.pathname}?join=${roomId}`;
+  const url=`${location.origin}${location.pathname}#join=${roomId}`;
   const text=`Hey! Come and play Word Salad with me 🥗🔤\n${url}`;
   if(navigator.share)navigator.share({title:'Word Salad',text,url});
   else{navigator.clipboard?.writeText(text);alert('Copied! Send it to your opponent.');}
