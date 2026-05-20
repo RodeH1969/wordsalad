@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,47 +29,35 @@
   .wheel-wrap{position:relative;width:210px;height:210px;margin:4px auto}
   svg.wheel{width:210px;height:210px}
   .turn-indicator{font-size:13px;letter-spacing:1px;text-align:center;padding:4px 0}
-
-  /* Timer */
   .timer-ring{position:relative;width:64px;height:64px;margin:0 auto}
   .timer-ring svg{transform:rotate(-90deg)}
   .timer-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Boogaloo',cursive;font-size:1.3rem;color:#f7e96b}
-
-  /* Word display strip */
-  .word-strip{min-height:52px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;width:100%;padding:6px 0}
-  .word-tile{width:40px;height:44px;background:#252540;border:2px solid #4a4a7a;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Boogaloo',cursive;font-size:1.3rem;color:#f0eee8;transition:all .08s}
+  .word-strip{min-height:46px;display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;width:100%;padding:4px 6px}
+  .word-tile{width:38px;height:42px;background:#252540;border:2px solid #4a4a7a;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Boogaloo',cursive;font-size:1.3rem;color:#f0eee8;transition:all .08s}
   .word-tile.centre{border-color:#4ade80;color:#4ade80}
-  .word-tile-empty{width:36px;height:40px;border:1.5px dashed #2a2a4a;border-radius:6px}
-
-  /* Letter keyboard */
-  .keyboard{width:100%;max-width:480px;background:#111128;border-top:1px solid #2a2a4a;padding:12px 10px 18px;position:sticky;bottom:0}
+  .keyboard{width:100%;max-width:480px;background:#111128;border-top:1px solid #2a2a4a;padding:10px 10px 16px;position:sticky;bottom:0}
   .kb-display-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:0 2px}
-  .kb-display-row .word-strip{flex:1;background:#0f0f1a;border-radius:10px;border:1px solid #2a2a4a;padding:6px 10px;min-height:46px}
+  .kb-display-row .word-strip{flex:1;background:#0f0f1a;border-radius:10px;border:1px solid #2a2a4a;min-height:46px}
   .kb-actions{display:flex;flex-direction:column;gap:6px}
   .kb-del{background:#2a1a1a;border:1px solid #5a3a3a;border-radius:8px;color:#f87171;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;padding:7px 10px;cursor:pointer;letter-spacing:1px;white-space:nowrap}
   .kb-del:active{transform:scale(0.95)}
   .kb-enter{background:#f7e96b;border:none;border-radius:8px;color:#0f0f1a;font-family:'DM Mono',monospace;font-size:11px;font-weight:600;padding:7px 10px;cursor:pointer;letter-spacing:1px;white-space:nowrap}
   .kb-enter:active{transform:scale(0.95)}
   .kb-enter:disabled{background:#3a3a2a;color:#666;cursor:not-allowed}
-
-  /* Letter tiles in keyboard */
   .kb-row{display:flex;justify-content:center;gap:7px;margin-bottom:7px}
-  .kb-key{height:52px;min-width:44px;flex:1;max-width:52px;background:#1e1e38;border:1.5px solid #3a3a5a;border-radius:8px;color:#f0eee8;font-family:'Boogaloo',cursive;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;user-select:none;-webkit-tap-highlight-color:transparent;position:relative}
+  .kb-key{height:52px;min-width:44px;flex:1;max-width:52px;background:#1e1e38;border:1.5px solid #3a3a5a;border-radius:8px;color:#f0eee8;font-family:'Boogaloo',cursive;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;user-select:none;-webkit-tap-highlight-color:transparent}
   .kb-key:active{transform:scale(0.92);background:#2e2e50}
   .kb-key.centre-key{background:#0d2a1e;border-color:#4ade80;color:#4ade80}
   .kb-key.centre-key:active{background:#0a3a28}
-  .kb-key.used-key{opacity:0.35}
-
   .msg{font-size:12px;text-align:center;min-height:16px;padding:2px 0;letter-spacing:1px}
   .msg-error{color:#f87171}
   .msg-ok{color:#4ade80}
   .msg-info{color:#f7e96b}
-
+  .msg-checking{color:#888}
   .history-list{list-style:none;display:flex;flex-wrap:wrap;gap:6px;min-height:28px}
   .history-list li{font-size:11px;padding:2px 9px;border-radius:20px}
   .word-valid{background:#0a2a1a;color:#4ade80;border:1px solid #4ade8044}
   .word-invalid{background:#2a0a0a;color:#f87171;border:1px solid #f8717144;text-decoration:line-through}
-
   .winner-title{font-family:'Boogaloo',cursive;font-size:3rem;color:#f7e96b;text-align:center;text-shadow:0 0 30px #f7e96b88}
   .loser-title{font-family:'Boogaloo',cursive;font-size:2.5rem;color:#f87171;text-align:center}
   .fireworks-wrap{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1000;overflow:hidden}
@@ -80,17 +67,18 @@
   #loading-msg{font-size:12px;color:#f7e96b;letter-spacing:2px;text-align:center;margin-top:6px}
   @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
   .shake{animation:shake .3s ease}
-  @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+  @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
   .pop{animation:pop .15s ease}
   .word-input-wrap{display:flex;gap:8px;width:100%}
   .word-input-wrap input{flex:1}
+  .checking-spinner{display:inline-block;width:10px;height:10px;border:2px solid #888;border-top-color:#f7e96b;border-radius:50%;animation:spin .6s linear infinite;margin-right:6px;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 <h1>WORD WHEEL DUEL</h1>
 <p class="tagline">Head to Head · Real Time</p>
 
-<!-- LOBBY -->
 <div id="screen-lobby" class="screen active">
   <div class="card">
     <label>Your name</label>
@@ -110,7 +98,6 @@
   <div id="loading-msg"></div>
 </div>
 
-<!-- WAITING -->
 <div id="screen-waiting" class="screen">
   <div class="card center">
     <p class="muted" style="margin-bottom:6px">ROOM CODE</p>
@@ -121,7 +108,6 @@
   <button class="btn btn-pink" onclick="shareRoom()" style="max-width:320px">📣 Share Room Code</button>
 </div>
 
-<!-- GAME -->
 <div id="screen-game" class="screen">
   <div class="card" style="padding:12px 16px">
     <div style="display:flex;justify-content:space-between;align-items:center">
@@ -157,7 +143,6 @@
   </div>
 </div>
 
-<!-- RESULT -->
 <div id="screen-result" class="screen">
   <div id="result-title" class="winner-title" style="margin-top:16px">🏆 YOU WIN!</div>
   <div class="card center" style="margin-top:8px">
@@ -167,20 +152,15 @@
   <button class="btn btn-secondary" onclick="resetGame()" style="max-width:320px;margin-top:-4px">Play Again</button>
 </div>
 
-<!-- KEYBOARD — always at bottom, only shown during game -->
 <div class="keyboard" id="keyboard" style="display:none">
-  <!-- Word being built display -->
   <div class="kb-display-row">
     <div class="word-strip" id="word-strip"><span style="color:#444;font-size:12px;letter-spacing:2px">TAP LETTERS</span></div>
     <div class="kb-actions">
       <button class="kb-del" onclick="deleteLetter()">⌫ DEL</button>
-      <button class="kb-enter" id="kb-enter-btn" onclick="submitWord()">ENTER</button>
+      <button class="kb-enter" id="kb-enter-btn" onclick="submitWord()" disabled>ENTER</button>
     </div>
   </div>
-
-  <!-- Row 1: outer letters first 5 -->
   <div class="kb-row" id="kb-row-1"></div>
-  <!-- Row 2: outer letters last 4 + centre -->
   <div class="kb-row" id="kb-row-2"></div>
 </div>
 
@@ -192,13 +172,14 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyDemo_REPLACE_WITH_YOUR_KEY",
-  authDomain: "wordwheel-duel.firebaseapp.com",
-  databaseURL: "https://wordwheel-duel-default-rtdb.firebaseio.com",
-  projectId: "wordwheel-duel",
-  storageBucket: "wordwheel-duel.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:000000000000000000000000"
+  apiKey: "AIzaSyAJWQFKLGBHS77ZNrRm5EmfpaBIYb_hLmw",
+  authDomain: "wordsalad-b1a9c.firebaseapp.com",
+  databaseURL: "https://wordsalad-b1a9c-default-rtdb.firebaseio.com",
+  projectId: "wordsalad-b1a9c",
+  storageBucket: "wordsalad-b1a9c.firebasestorage.app",
+  messagingSenderId: "185162364608",
+  appId: "1:185162364608:web:a1b5bd1859d19ef81a1f25",
+  measurementId: "G-60875GFDB3"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -207,38 +188,55 @@ const OUTER_LETTERS = ['C','G','R','H','L','O','T','I','T'];
 const CENTRE_LETTER = 'H';
 const ALL_LETTERS = [...OUTER_LETTERS, CENTRE_LETTER];
 
-const VALID_WORDS = new Set([
-  'TORCH','RICH','ITCH','CHIT','LOCH','CLOTH','COLT','HOLT',
-  'GRIT','GIRL','GIRTH','GLITCH','GILT','THRO','THIRL','THILL','THRILL',
-  'ROTCH','ROTI','RICH','LITH','LOTIC','LORIC','INCH','OTIC',
-  'HILT','HOLO','CHOLI','CHIRO','CHOIR','TICH','TIRL','TORC',
-  'ITCH','LITHIC','ORCHID','GOTHIC','GRIOT','TILTH','CLOTH',
-  'CROTCH','ORCHIL','THORIC','TORIC','HOICK','THICK','THICKO',
-  'TRICOT','CHIT','CHITON','CHORIC','LOCH','HOLT','LIGHT','LICHT',
-  'GLITCH','ROTI','ROTCH','GIRO','TOCO','TOCOL','TILTHS','COLT',
-  'TORCH','THILL','THIRL','CHOIR','ORCHID','GOTHIC','CLOTH'
-]);
-
 let currentWord = [];
 let myId = null, myName = '', roomId = null, roomRef = null;
 let mySlot = null, timerInterval = null, timeLeft = 20;
 let listenersActive = false, gameState = null, isMyTurn = false;
+let isSubmitting = false;
 
-// ── BUILD KEYBOARD ────────────────────────────────────────────────────────────
+async function checkDictionary(word) {
+  try {
+    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
+    if (!res.ok) return false;
+    const data = await res.json();
+    return Array.isArray(data) && data.length > 0;
+  } catch {
+    return true;
+  }
+}
+
+function isPlural(word, usedWords) {
+  if (!word.endsWith('S')) return false;
+  const stem = word.slice(0, -1);
+  const validPlayed = usedWords.filter(w => w.valid).map(w => w.word);
+  if (validPlayed.includes(stem)) return true;
+  if (validPlayed.includes(stem.slice(0,-1)) && stem.endsWith('E')) return true;
+  return false;
+}
+
+async function validateWord(word, usedWords) {
+  if (word.length < 4) return { ok: false, msg: 'Must be 4+ letters' };
+  if (!word.includes(CENTRE_LETTER)) return { ok: false, msg: `Must include '${CENTRE_LETTER}'` };
+  const pool = [...ALL_LETTERS];
+  for (const ch of word) {
+    const idx = pool.indexOf(ch);
+    if (idx === -1) return { ok: false, msg: `'${ch}' not in wheel` };
+    pool.splice(idx, 1);
+  }
+  const validPlayed = usedWords.filter(w => w.valid).map(w => w.word);
+  if (validPlayed.includes(word)) return { ok: false, msg: 'Already played!' };
+  if (isPlural(word, usedWords)) return { ok: false, msg: 'No plurals!' };
+  const inDict = await checkDictionary(word);
+  if (!inDict) return { ok: false, msg: 'Not a valid word' };
+  return { ok: true };
+}
+
 function buildKeyboard() {
   const row1 = document.getElementById('kb-row-1');
   const row2 = document.getElementById('kb-row-2');
   row1.innerHTML = ''; row2.innerHTML = '';
-
-  // Row 1: first 5 outer letters
-  OUTER_LETTERS.slice(0, 5).forEach((letter, i) => {
-    row1.appendChild(makeKey(letter, false, i));
-  });
-
-  // Row 2: last 4 outer letters + centre H
-  OUTER_LETTERS.slice(5).forEach((letter, i) => {
-    row2.appendChild(makeKey(letter, false, i + 5));
-  });
+  OUTER_LETTERS.slice(0, 5).forEach((l, i) => row1.appendChild(makeKey(l, false, i)));
+  OUTER_LETTERS.slice(5).forEach((l, i) => row2.appendChild(makeKey(l, false, i+5)));
   row2.appendChild(makeKey(CENTRE_LETTER, true, 99));
 }
 
@@ -247,28 +245,25 @@ function makeKey(letter, isCentre, idx) {
   btn.className = 'kb-key' + (isCentre ? ' centre-key' : '');
   btn.textContent = letter;
   btn.id = 'kb-key-' + idx;
-  btn.setAttribute('data-letter', letter);
-  btn.setAttribute('data-idx', idx);
   btn.addEventListener('click', () => tapLetter(letter, isCentre));
   return btn;
 }
 
-// ── TAP LETTER ────────────────────────────────────────────────────────────────
 function tapLetter(letter, isCentre) {
-  if (!isMyTurn) return;
+  if (!isMyTurn || isSubmitting) return;
   if (currentWord.length >= 12) return;
   currentWord.push({ letter, isCentre });
   renderWordStrip();
-  // pop animation on key
-  const keys = document.querySelectorAll(`.kb-key[data-letter="${letter}"]`);
-  keys.forEach(k => {
-    k.classList.add('pop');
-    setTimeout(() => k.classList.remove('pop'), 150);
+  document.querySelectorAll('.kb-key').forEach(k => {
+    if (k.textContent === letter) {
+      k.classList.add('pop');
+      setTimeout(() => k.classList.remove('pop'), 150);
+    }
   });
 }
 
 function deleteLetter() {
-  if (!isMyTurn) return;
+  if (!isMyTurn || isSubmitting) return;
   currentWord.pop();
   renderWordStrip();
 }
@@ -277,6 +272,7 @@ function renderWordStrip() {
   const strip = document.getElementById('word-strip');
   if (currentWord.length === 0) {
     strip.innerHTML = '<span style="color:#444;font-size:12px;letter-spacing:2px">TAP LETTERS</span>';
+    document.getElementById('kb-enter-btn').disabled = true;
     return;
   }
   strip.innerHTML = '';
@@ -286,26 +282,33 @@ function renderWordStrip() {
     tile.textContent = letter;
     strip.appendChild(tile);
   });
-  // enable/disable enter
   document.getElementById('kb-enter-btn').disabled = currentWord.length < 4;
 }
 
-// ── WHEEL ─────────────────────────────────────────────────────────────────────
+function setKeysEnabled(enabled) {
+  document.querySelectorAll('.kb-key').forEach(k => {
+    k.style.opacity = enabled ? '1' : '0.3';
+    k.style.pointerEvents = enabled ? 'auto' : 'none';
+  });
+  document.getElementById('kb-del').style.opacity = enabled ? '1' : '0.3';
+  document.getElementById('kb-del').style.pointerEvents = enabled ? 'auto' : 'none';
+}
+
 function drawWheel() {
   const svg = document.getElementById('wheel-svg');
   const cx = 120, cy = 120, outerR = 115, innerR = 55;
   const n = OUTER_LETTERS.length;
   let paths = '';
   for (let i = 0; i < n; i++) {
-    const a1 = (i / n) * 2 * Math.PI - Math.PI / 2;
-    const a2 = ((i + 1) / n) * 2 * Math.PI - Math.PI / 2;
-    const mid = (a1 + a2) / 2;
-    const x1o = cx + outerR * Math.cos(a1), y1o = cy + outerR * Math.sin(a1);
-    const x2o = cx + outerR * Math.cos(a2), y2o = cy + outerR * Math.sin(a2);
-    const x1i = cx + innerR * Math.cos(a2), y1i = cy + innerR * Math.sin(a2);
-    const x2i = cx + innerR * Math.cos(a1), y2i = cy + innerR * Math.sin(a1);
-    const tx = cx + ((outerR + innerR) / 2) * Math.cos(mid);
-    const ty = cy + ((outerR + innerR) / 2) * Math.sin(mid) + 1;
+    const a1 = (i/n)*2*Math.PI - Math.PI/2;
+    const a2 = ((i+1)/n)*2*Math.PI - Math.PI/2;
+    const mid = (a1+a2)/2;
+    const x1o=cx+outerR*Math.cos(a1),y1o=cy+outerR*Math.sin(a1);
+    const x2o=cx+outerR*Math.cos(a2),y2o=cy+outerR*Math.sin(a2);
+    const x1i=cx+innerR*Math.cos(a2),y1i=cy+innerR*Math.sin(a2);
+    const x2i=cx+innerR*Math.cos(a1),y2i=cy+innerR*Math.sin(a1);
+    const tx=cx+((outerR+innerR)/2)*Math.cos(mid);
+    const ty=cy+((outerR+innerR)/2)*Math.sin(mid)+1;
     paths += `<path d="M${x1o},${y1o} A${outerR},${outerR} 0 0,1 ${x2o},${y2o} L${x1i},${y1i} A${innerR},${innerR} 0 0,0 ${x2i},${y2i} Z" fill="#1a1a2e" stroke="#3a3a5a" stroke-width="1.5"/>`;
     paths += `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="middle" fill="#f0eee8" font-family="Boogaloo,cursive" font-size="20">${OUTER_LETTERS[i]}</text>`;
   }
@@ -314,26 +317,25 @@ function drawWheel() {
     `<text x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="middle" fill="#4ade80" font-family="Boogaloo,cursive" font-size="36">${CENTRE_LETTER}</text>`;
 }
 
-// ── FIREBASE ──────────────────────────────────────────────────────────────────
-function uid() { return Math.random().toString(36).slice(2,9).toUpperCase(); }
-function roomCode() { return Math.random().toString(36).slice(2,8).toUpperCase(); }
-
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.getElementById('keyboard').style.display = id === 'screen-game' ? 'block' : 'none';
 }
 
+function uid() { return Math.random().toString(36).slice(2,9).toUpperCase(); }
+function roomCode() { return Math.random().toString(36).slice(2,8).toUpperCase(); }
+
 async function createRoom() {
   const name = document.getElementById('player-name').value.trim();
   if (!name) { setLoading('Enter your name first'); return; }
-  myName = name; myId = uid(); mySlot = 'p1'; roomId = roomCode();
+  myName=name; myId=uid(); mySlot='p1'; roomId=roomCode();
   setLoading('Creating room...');
-  roomRef = db.ref('rooms/' + roomId);
+  roomRef = db.ref('rooms/'+roomId);
   await roomRef.set({
-    created: Date.now(), p1: { id: myId, name: myName }, p2: null,
-    status: 'waiting', round: 1, currentTurn: 'p1',
-    firstRound: true, p1FailedFirst: false, words: [], loser: null
+    created: Date.now(), p1:{id:myId,name:myName}, p2:null,
+    status:'waiting', round:1, currentTurn:'p1',
+    firstRound:true, p1FailedFirst:false, words:[], loser:null
   });
   document.getElementById('room-display-code').textContent = roomId;
   show('screen-waiting');
@@ -345,13 +347,13 @@ async function joinRoom() {
   const code = document.getElementById('join-code').value.trim().toUpperCase();
   if (!name) { setLoading('Enter your name first'); return; }
   if (!code || code.length < 4) { setLoading('Enter a valid room code'); return; }
-  myName = name; myId = uid(); mySlot = 'p2'; roomId = code;
+  myName=name; myId=uid(); mySlot='p2'; roomId=code;
   setLoading('Joining...');
-  roomRef = db.ref('rooms/' + roomId);
+  roomRef = db.ref('rooms/'+roomId);
   const snap = await roomRef.once('value');
   if (!snap.exists()) { setLoading('Room not found.'); return; }
   if (snap.val().p2) { setLoading('Room is full.'); return; }
-  await roomRef.update({ p2: { id: myId, name: myName }, status: 'playing' });
+  await roomRef.update({ p2:{id:myId,name:myName}, status:'playing' });
   document.getElementById('room-display-code').textContent = roomId;
   show('screen-waiting');
   listenRoom();
@@ -364,42 +366,36 @@ function listenRoom() {
     if (!snap.exists()) return;
     const data = snap.val();
     gameState = data;
-    if (data.status === 'playing' && document.getElementById('screen-waiting').classList.contains('active')) {
+    if (data.status==='playing' && document.getElementById('screen-waiting').classList.contains('active')) {
       show('screen-game'); drawWheel(); buildKeyboard();
     }
-    if (data.status === 'playing') updateGameUI(data);
-    if (data.status === 'finished') endGame(data);
+    if (data.status==='playing') updateGameUI(data);
+    if (data.status==='finished') endGame(data);
   });
 }
 
 function updateGameUI(data) {
   document.getElementById('round-num').textContent = data.round || 1;
   const words = data.words || [];
-  document.getElementById('used-count').textContent = words.filter(w => w.valid).length;
+  document.getElementById('used-count').textContent = words.filter(w=>w.valid).length;
   renderWordHistory(words);
-
   isMyTurn = (data.currentTurn === mySlot);
-  const p1Name = data.p1?.name || 'P1';
-  const p2Name = data.p2?.name || 'P2';
-  const currentName = data.currentTurn === 'p1' ? p1Name : p2Name;
+  const p1Name = data.p1?.name||'P1';
+  const p2Name = data.p2?.name||'P2';
+  const currentName = data.currentTurn==='p1' ? p1Name : p2Name;
   const turnText = document.getElementById('turn-text');
-
   if (isMyTurn) {
     turnText.textContent = '⚡ YOUR TURN';
     turnText.style.color = '#f7e96b';
-    currentWord = [];
-    renderWordStrip();
+    currentWord = []; renderWordStrip();
+    setKeysEnabled(true);
     startTimer();
   } else {
     turnText.textContent = `⏳ ${currentName}'s turn...`;
     turnText.style.color = '#888';
+    setKeysEnabled(false);
     stopTimer(); resetTimerDisplay();
   }
-  // grey out keys when not your turn
-  document.querySelectorAll('.kb-key').forEach(k => {
-    k.style.opacity = isMyTurn ? '1' : '0.3';
-    k.style.pointerEvents = isMyTurn ? 'auto' : 'none';
-  });
 }
 
 function renderWordHistory(words) {
@@ -407,29 +403,27 @@ function renderWordHistory(words) {
   ul.innerHTML = '';
   [...words].reverse().forEach(w => {
     const li = document.createElement('li');
-    li.textContent = w.word;
+    li.textContent = w.word + (w.player ? ' · '+w.player : '');
     li.className = w.valid ? 'word-valid' : 'word-invalid';
     ul.appendChild(li);
   });
 }
 
-// ── TIMER ─────────────────────────────────────────────────────────────────────
 function startTimer() {
-  stopTimer(); timeLeft = 20; updateTimerDisplay(20);
+  stopTimer(); timeLeft=20; updateTimerDisplay(20);
   timerInterval = setInterval(() => {
     timeLeft--;
     updateTimerDisplay(timeLeft);
-    if (timeLeft <= 0) { stopTimer(); handleTimeout(); }
+    if (timeLeft<=0) { stopTimer(); handleTimeout(); }
   }, 1000);
 }
-function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval=null; } }
 function resetTimerDisplay() { updateTimerDisplay(20); }
 function updateTimerDisplay(t) {
   document.getElementById('timer-num').textContent = t;
   const arc = document.getElementById('timer-arc');
-  const offset = 169.6 * (1 - t / 20);
-  arc.setAttribute('stroke-dashoffset', offset);
-  arc.setAttribute('stroke', t > 7 ? '#f7e96b' : '#f87171');
+  arc.setAttribute('stroke-dashoffset', 169.6*(1-t/20));
+  arc.setAttribute('stroke', t>7 ? '#f7e96b' : '#f87171');
 }
 async function handleTimeout() {
   if (!isMyTurn) return;
@@ -437,140 +431,120 @@ async function handleTimeout() {
   await recordFailure('TIMEOUT');
 }
 
-// ── SUBMIT ────────────────────────────────────────────────────────────────────
 async function submitWord() {
-  if (!isMyTurn || currentWord.length < 4) return;
-  const word = currentWord.map(t => t.letter).join('');
-  currentWord = []; renderWordStrip();
+  if (!isMyTurn || currentWord.length < 4 || isSubmitting) return;
+  isSubmitting = true;
   stopTimer();
-
-  const validation = validateWord(word, gameState?.words || []);
+  setKeysEnabled(false);
+  document.getElementById('kb-enter-btn').disabled = true;
+  const word = currentWord.map(t=>t.letter).join('');
+  currentWord = []; renderWordStrip();
+  setGameMsg('<span class="checking-spinner"></span> Checking...', 'checking');
+  const validation = await validateWord(word, gameState?.words || []);
   if (!validation.ok) {
     setGameMsg(validation.msg, 'error');
-    document.getElementById('turn-card') && document.getElementById('turn-card').classList.add('shake');
-    setTimeout(() => document.getElementById('turn-card')?.classList.remove('shake'), 400);
     await recordFailure(word);
-    return;
+  } else {
+    setGameMsg('✓ ' + word, 'ok');
+    await recordSuccess(word);
   }
-  setGameMsg('✓ ' + word, 'ok');
-  await recordSuccess(word);
+  isSubmitting = false;
 }
 
-function validateWord(word, usedWords) {
-  if (word.length < 4) return { ok: false, msg: 'Must be 4+ letters' };
-  if (!word.includes(CENTRE_LETTER)) return { ok: false, msg: `Must contain '${CENTRE_LETTER}'` };
-  const pool = [...ALL_LETTERS];
-  for (const ch of word) {
-    const idx = pool.indexOf(ch);
-    if (idx === -1) return { ok: false, msg: `Letter '${ch}' not in wheel` };
-    pool.splice(idx, 1);
+function setGameMsg(html, type) {
+  const el = document.getElementById('game-msg');
+  el.innerHTML = html;
+  el.className = 'msg msg-' + type;
+  if (type !== 'checking') {
+    setTimeout(() => { el.innerHTML=''; el.className='msg'; }, 3000);
   }
-  const used = usedWords.filter(w => w.valid).map(w => w.word);
-  if (used.includes(word)) return { ok: false, msg: 'Already played!' };
-  if (word.endsWith('S') && (used.includes(word.slice(0,-1)) || VALID_WORDS.has(word.slice(0,-1)))) {
-    return { ok: false, msg: 'No plurals!' };
-  }
-  if (!VALID_WORDS.has(word)) return { ok: false, msg: 'Not a valid word' };
-  return { ok: true };
 }
 
 async function recordSuccess(word) {
-  const words = [...(gameState.words || []), { word, valid: true, player: myName, slot: mySlot }];
-  const nextTurn = mySlot === 'p1' ? 'p2' : 'p1';
-  await roomRef.update({ words, currentTurn: nextTurn, round: (gameState.round || 1) + 1, firstRound: false });
+  const words = [...(gameState.words||[]), {word, valid:true, player:myName, slot:mySlot}];
+  const nextTurn = mySlot==='p1' ? 'p2' : 'p1';
+  await roomRef.update({ words, currentTurn:nextTurn, round:(gameState.round||1)+1, firstRound:false });
 }
 
 async function recordFailure(word) {
-  const words = [...(gameState.words || []), { word, valid: false, player: myName, slot: mySlot }];
-  if (gameState.firstRound && mySlot === 'p1' && !gameState.p1FailedFirst) {
-    await roomRef.update({ words, currentTurn: 'p2', p1FailedFirst: true });
-    setGameMsg('P2 gets a chance!', 'info');
+  const words = [...(gameState.words||[]), {word, valid:false, player:myName, slot:mySlot}];
+  if (gameState.firstRound && mySlot==='p1' && !gameState.p1FailedFirst) {
+    await roomRef.update({ words, currentTurn:'p2', p1FailedFirst:true });
+    setGameMsg("P2 gets a chance!", 'info');
+    isSubmitting = false;
     return;
   }
-  await roomRef.update({ words, status: 'finished', loser: mySlot });
+  await roomRef.update({ words, status:'finished', loser:mySlot });
 }
 
-// ── END GAME ──────────────────────────────────────────────────────────────────
 function endGame(data) {
   stopTimer();
   const iWon = data.loser !== mySlot;
-  const loserName = data.loser === 'p1' ? data.p1?.name : data.p2?.name;
-  const winnerName = data.loser === 'p1' ? data.p2?.name : data.p1?.name;
+  const loserName = data.loser==='p1' ? data.p1?.name : data.p2?.name;
+  const winnerName = data.loser==='p1' ? data.p2?.name : data.p1?.name;
   show('screen-result');
   const title = document.getElementById('result-title');
   const detail = document.getElementById('result-detail');
   const shareBtn = document.getElementById('share-win-btn');
   if (iWon) {
-    title.className = 'winner-title'; title.textContent = '🏆 YOU WIN!';
-    detail.textContent = `${loserName} couldn't keep up.\nYou smashed it — share and find your next challenger!`;
-    shareBtn.textContent = '🎉 Challenge a Friend!';
+    title.className='winner-title'; title.textContent='🏆 YOU WIN!';
+    detail.textContent=`${loserName} couldn't keep up.\nShare and find your next challenger!`;
+    shareBtn.textContent='🎉 Challenge a Friend!';
     launchFireworks();
   } else {
-    title.className = 'loser-title'; title.textContent = '💀 YOU LOSE';
-    detail.textContent = `${winnerName} beat you.\nRevenge is one share away — invite someone to play!`;
-    shareBtn.textContent = '😤 Invite Someone to Beat';
+    title.className='loser-title'; title.textContent='💀 YOU LOSE';
+    detail.textContent=`${winnerName} beat you.\nRevenge is one share away!`;
+    shareBtn.textContent='😤 Invite Someone to Beat';
   }
 }
 
-// ── FIREWORKS ─────────────────────────────────────────────────────────────────
 function launchFireworks() {
-  const wrap = document.getElementById('fw-wrap'); wrap.style.display = 'block';
-  const canvas = document.getElementById('fw'); const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-  const particles = [];
-  function burst(x, y) {
-    for (let i = 0; i < 60; i++) {
-      const angle = Math.random() * Math.PI * 2, speed = 2 + Math.random() * 5;
-      particles.push({ x, y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, life: 1,
-        color: `hsl(${Math.random()*360},90%,65%)`, size: 2+Math.random()*3 });
+  const wrap=document.getElementById('fw-wrap'); wrap.style.display='block';
+  const canvas=document.getElementById('fw'); const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  const particles=[];
+  function burst(x,y) {
+    for(let i=0;i<60;i++){
+      const a=Math.random()*Math.PI*2, s=2+Math.random()*5;
+      particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,color:`hsl(${Math.random()*360},90%,65%)`,size:2+Math.random()*3});
     }
   }
-  let blasts = 0;
-  const bi = setInterval(() => {
-    burst(Math.random()*canvas.width, Math.random()*canvas.height*0.6);
-    if (++blasts >= 8) clearInterval(bi);
-  }, 350);
-  function frame() {
-    ctx.fillStyle = 'rgba(15,15,26,0.18)'; ctx.fillRect(0,0,canvas.width,canvas.height);
-    particles.forEach((p,i) => {
-      p.x+=p.vx; p.y+=p.vy; p.vy+=0.08; p.life-=0.018;
-      ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.color;
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
-      if(p.life<=0) particles.splice(i,1);
+  let blasts=0;
+  const bi=setInterval(()=>{ burst(Math.random()*canvas.width,Math.random()*canvas.height*0.6); if(++blasts>=8)clearInterval(bi); },350);
+  function frame(){
+    ctx.fillStyle='rgba(15,15,26,0.18)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    particles.forEach((p,i)=>{
+      p.x+=p.vx;p.y+=p.vy;p.vy+=0.08;p.life-=0.018;
+      ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
+      if(p.life<=0)particles.splice(i,1);
     });
     ctx.globalAlpha=1;
-    if(particles.length>0||blasts<8) requestAnimationFrame(frame);
+    if(particles.length>0||blasts<8)requestAnimationFrame(frame);
     else setTimeout(()=>wrap.style.display='none',800);
   }
   requestAnimationFrame(frame);
 }
 
-// ── SHARE ─────────────────────────────────────────────────────────────────────
 function shareRoom() {
-  const text = `Join my Word Wheel Duel! Room: ${roomId}\n${location.href}`;
-  if (navigator.share) navigator.share({ title:'Word Wheel Duel', text });
-  else { navigator.clipboard?.writeText(text); alert('Copied: ' + roomId); }
+  const text=`Join my Word Wheel Duel! Room: ${roomId}\n${location.href}`;
+  if(navigator.share)navigator.share({title:'Word Wheel Duel',text});
+  else{navigator.clipboard?.writeText(text);alert('Copied: '+roomId);}
 }
 function shareWin() {
-  const text = `I just won a Word Wheel Duel! 🏆 Think you can beat me?\n${location.href}`;
-  if (navigator.share) navigator.share({ title:'Word Wheel Duel', text });
-  else { navigator.clipboard?.writeText(text); alert('Share link copied!'); }
+  const text=`I just won a Word Wheel Duel! 🏆 Think you can beat me?\n${location.href}`;
+  if(navigator.share)navigator.share({title:'Word Wheel Duel',text});
+  else{navigator.clipboard?.writeText(text);alert('Share link copied!');}
 }
-
-function setLoading(msg) { document.getElementById('loading-msg').textContent = msg; }
-function setGameMsg(msg, type) {
-  const el = document.getElementById('game-msg');
-  el.textContent = msg; el.className = 'msg msg-' + type;
-  setTimeout(() => { el.textContent=''; el.className='msg'; }, 3000);
-}
-function resetGame() {
-  stopTimer(); listenersActive = false;
-  if (roomRef) roomRef.off();
-  roomRef=null; roomId=null; mySlot=null; gameState=null; currentWord=[];
-  document.getElementById('word-history').innerHTML = '';
-  document.getElementById('player-name').value = '';
-  document.getElementById('join-code').value = '';
-  setLoading(''); show('screen-lobby');
+function setLoading(msg){document.getElementById('loading-msg').textContent=msg;}
+function resetGame(){
+  stopTimer();listenersActive=false;
+  if(roomRef)roomRef.off();
+  roomRef=null;roomId=null;mySlot=null;gameState=null;currentWord=[];isSubmitting=false;
+  document.getElementById('word-history').innerHTML='';
+  document.getElementById('player-name').value='';
+  document.getElementById('join-code').value='';
+  setLoading('');show('screen-lobby');
 }
 
 drawWheel();
