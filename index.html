@@ -379,6 +379,35 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
   display:inline-block;flex-shrink:0;
 }
 
+/* ═══ NAME ENTRY ═══════════════════════════════════════════ */
+.name-pulse-wrap{
+  border:3px solid #ff6b9d;border-radius:16px;
+  padding:12px 14px;background:#fff0f6;
+  animation:namepulse 1.6s ease-in-out infinite;
+  transition:border-color .2s, background .2s;
+}
+.name-pulse-wrap.focused{
+  animation:none;
+  border-color:#ff6b9d;
+  background:#fff0f6;
+  box-shadow:0 0 0 4px rgba(255,107,157,.2);
+}
+@keyframes namepulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,107,157,.5);border-color:#ff6b9d;}
+  50%{box-shadow:0 0 0 10px rgba(255,107,157,0);border-color:#ff3d8a;}
+}
+.name-pulse-label{
+  font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;
+  color:#ff6b9d;margin-bottom:8px;text-align:center;
+}
+.name-pulse-inp{
+  border:none !important;background:transparent !important;
+  font-size:22px !important;font-weight:700 !important;
+  color:#111827 !important;padding:4px 2px !important;
+  width:100%;outline:none;
+}
+.name-pulse-inp::placeholder{color:rgba(255,107,157,.5) !important;}
+
 /* ═══ MODE CARDS ══════════════════════════════════════════ */
 .mode-card{
   width:100%;display:flex;align-items:center;justify-content:space-between;
@@ -481,9 +510,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
   </div>
 
   <!-- name field -->
-  <div style="width:100%;max-width:400px;margin-bottom:12px">
-    <span class="lbl">YOUR NAME</span>
-    <input id="player-name" class="inp" type="text" placeholder="Enter your name" maxlength="16" autocomplete="off"/>
+  <div class="name-pulse-wrap" style="width:100%;max-width:400px;margin-bottom:14px">
+    <div class="name-pulse-label">👇 ENTER YOUR NAME TO PLAY</div>
+    <input id="player-name" class="inp name-pulse-inp" type="text" placeholder="Your name..." maxlength="16" autocomplete="off" onfocus="this.parentElement.classList.add('focused')" onblur="this.parentElement.classList.remove('focused')"/>
   </div>
 
   <!-- MODE CARDS -->
@@ -638,7 +667,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
     <div class="res-pills" id="res-pills"></div>
   </div>
   <button class="btn-pink" id="res-share-btn" onclick="shareResult()">🎉 &nbsp;CHALLENGE A FRIEND</button>
-  <button class="btn-ghost" onclick="resetGame()">PLAY AGAIN</button>
+
 </div>
 
 <!-- LOSE POPUP -->
@@ -1408,7 +1437,7 @@ function showResultScreen(d,iWon){
     if(icon)icon.textContent='💀';
     if(title){title.textContent='YOU LOSE!';title.className='rlose';}
     if(detail)detail.textContent=`${winnerName} beat you.\nRevenge is one invite away!`;
-    if(share)share.textContent='😤  INVITE SOMEONE TO BEAT';
+    if(share)share.textContent='😤  SEEK REDEMPTION — SHARE!';
   }
 }
 
@@ -1615,7 +1644,7 @@ function showTurnPopup(lastWord, lastPlayer){
   if(lastWord){
     if(pw)pw.style.display='block';
     if(pv)pv.textContent=lastWord;
-    if(title)title.textContent=`${lastPlayer||'THEIR'} WORD!`;
+    if(title)title.textContent=`${(lastPlayer||'THEIR').toUpperCase()}'S WORD!`;
     if(icon)icon.textContent='🎯';
     if(taunt)taunt.textContent=getRandTaunt();
   } else {
