@@ -233,7 +233,34 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 .kb-key.locked{opacity:.3;pointer-events:none;}
 
 /* ═══ RESULT ══════════════════════════════════════════════ */
-#result{gap:12px;max-width:400px;width:100%;margin:0 auto;}
+/* Result is a fixed overlay with a centred card — not a full screen */
+#result{
+  position:fixed;inset:0;z-index:88;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+  padding:20px;
+}
+#result.active{display:flex;}
+#result-card{
+  background:#fff;border-radius:20px;
+  border:3px solid #bbf7d0;
+  padding:24px 20px 20px;
+  max-width:340px;width:100%;
+  text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+  position:relative;
+  display:flex;flex-direction:column;gap:10px;
+  max-height:85vh;overflow-y:auto;
+}
+#result-card.lose-card{ border-color:#fecaca; }
+#result-close-btn{
+  position:absolute;top:10px;right:12px;
+  background:#f3f4f6;border:none;border-radius:50%;
+  width:32px;height:32px;font-size:18px;cursor:pointer;
+  color:#6b7280;display:flex;align-items:center;justify-content:center;
+  line-height:1;flex-shrink:0;
+}
+#result-close-btn:active{background:#e5e7eb;}
 #res-icon{font-size:54px;}
 #res-title{
   font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,14vw,68px);
@@ -691,17 +718,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 </div>
 
 <!-- RESULT -->
-<div id="result" class="screen">
-  <button onclick="forceCloseAll()" style="position:fixed;top:16px;right:16px;z-index:99;background:#f3f4f6;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;color:#6b7280;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.1);">✕</button>
-  <div id="res-icon">🏆</div>
-  <div id="res-title" class="rwin">YOU WIN!</div>
-  <div id="res-detail"></div>
-  <div class="res-words">
-    <div class="res-wlbl">WORDS PLAYED</div>
-    <div class="res-pills" id="res-pills"></div>
+<div id="result">
+  <div id="result-card">
+    <button id="result-close-btn" onclick="forceCloseAll()">✕</button>
+    <div id="res-icon">🏆</div>
+    <div id="res-title" class="rwin">YOU WIN!</div>
+    <div id="res-detail"></div>
+    <div class="res-words">
+      <div class="res-wlbl">WORDS PLAYED</div>
+      <div class="res-pills" id="res-pills"></div>
+    </div>
+    <button class="btn-pink" id="res-share-btn" onclick="shareResult()">🎉 &nbsp;CHALLENGE A FRIEND</button>
   </div>
-  <button class="btn-pink" id="res-share-btn" onclick="shareResult()">🎉 &nbsp;CHALLENGE A FRIEND</button>
-
 </div>
 
 <!-- LOSE POPUP -->
@@ -1050,11 +1078,25 @@ window.addEventListener('load',()=>{
 
 // ── SCREENS ───────────────────────────────────────────────
 function showScreen(id){
+  // Result is a fixed overlay — handle separately
+  if(id==='result') return; // use showResult() instead
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  // Also hide result overlay when switching screens
+  const res=document.getElementById('result');
+  if(res)res.style.display='none';
   const el=document.getElementById(id);
   if(el){el.classList.add('active'); el.style.display='flex';}
   const rb=document.getElementById('rules-btn');
   if(rb)rb.style.display=(id==='splash')?'none':'block';
+}
+
+function showResult(){
+  const el=document.getElementById('result');
+  if(el){el.style.display='flex';}
+}
+function hideResult(){
+  const el=document.getElementById('result');
+  if(el){el.style.display='none';}
 }
 
 // ── JOIN MODE LOBBY (invited player) ──────────────────────
@@ -1471,7 +1513,7 @@ function closeLosePopup(){
 }
 
 function showResultScreen(d,iWon){
-  showScreen('result');
+  showResult();
   const loserName=d.loser==='p1'?d.p1?.name:d.p2?.name;
   const winnerName=d.loser==='p1'?d.p2?.name:d.p1?.name;
   const icon=document.getElementById('res-icon');
@@ -1489,11 +1531,15 @@ function showResultScreen(d,iWon){
   if(iWon){
     if(icon)icon.textContent='🏆';
     if(title){title.textContent='YOU WIN!';title.className='rwin';}
+    const rc=document.getElementById('result-card');
+    if(rc)rc.classList.remove('lose-card');
     if(detail)detail.textContent=`${loserName} ran out of words.\nTime to find your next challenger!`;
     if(share)share.textContent='🎉  CHALLENGE A FRIEND';
   } else {
     if(icon)icon.textContent='💀';
     if(title){title.textContent='YOU LOSE!';title.className='rlose';}
+    const rc=document.getElementById('result-card');
+    if(rc)rc.classList.add('lose-card');
     if(detail)detail.textContent=`${winnerName} beat you.\nRevenge is one invite away!`;
     if(share)share.textContent='😤  SEEK REDEMPTION — SHARE!';
   }
@@ -1617,29 +1663,23 @@ async function shareResult(){
 // ── RESET ─────────────────────────────────────────────────
 // ── CLEAR ALL POPUPS ──────────────────────────────────────
 function forceCloseAll(){
-  // Nuclear close — hide everything, go back to lobby
-  const popups=['lose-popup','turn-popup','nicejob-popup','rules-popup'];
-  popups.forEach(id=>{
+  // Close result overlay
+  hideResult();
+  // Close all other popups
+  ['lose-popup','turn-popup','nicejob-popup','rules-popup'].forEach(id=>{
     const el=document.getElementById(id);
     if(el){el.classList.remove('open');el.style.display='none';}
   });
   pendingEndData=null;
   if(turnPopupTimer){clearTimeout(turnPopupTimer);turnPopupTimer=null;}
-  // If a new game is already in progress (listenersOn), don't go to lobby
-  // Just clear the popups and stay where we are
 }
 
 function clearAllPopups(){
   // Force-close EVERY popup — both class and display style
-  const ids=['lose-popup','turn-popup','nicejob-popup','rules-popup','challenge-panel'];
-  ids.forEach(id=>{
+  hideResult();
+  ['lose-popup','turn-popup','nicejob-popup','rules-popup'].forEach(id=>{
     const el=document.getElementById(id);
-    if(!el)return;
-    el.classList.remove('open');
-    // For fixed overlays that use display:flex when open, force to none
-    if(id==='lose-popup'||id==='nicejob-popup'||id==='turn-popup'||id==='rules-popup'){
-      el.style.display='none';
-    }
+    if(el){el.classList.remove('open');el.style.display='none';}
   });
   // Stop any popup timers
   if(turnPopupTimer){clearTimeout(turnPopupTimer);turnPopupTimer=null;}
