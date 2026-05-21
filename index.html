@@ -861,7 +861,7 @@ const PUZZLES=[
 let OUTER=[...PUZZLES[0].outer];
 let CENTRE=PUZZLES[0].centre;
 let POOL=[...OUTER,CENTRE];
-const TURNS=40;
+const TURNS=25;
 
 const TAUNTS=[
   "DON'T BE THE FIRST TO BLINK!",
@@ -1120,9 +1120,13 @@ function listenRoom(){
   roomRef.on('value',snap=>{
     if(!snap.exists())return;
     const d=snap.val(); gameState=d;
-    if(d.status==='playing'&&document.getElementById('waiting').classList.contains('active')){
+    if(d.status==='playing'&&(
+      document.getElementById('waiting').classList.contains('active')||
+      document.getElementById('join-invite').classList.contains('active')
+    )){
       // Both players load the same random puzzle from room data
       if(d.puzzleIdx !== undefined) applyPuzzle(d.puzzleIdx);
+      kbBuilt=false; // ensure keyboard rebuilds fresh
       showScreen('game');
       drawWheel('wheel-svg',false);
       buildKeyboard();
@@ -1576,10 +1580,27 @@ async function shareResult(){
   if(navigator.share)navigator.share({title:'Word Muddle',text,url});
   else{navigator.clipboard?.writeText(text);alert('Copied! Share this link: '+url);}
 
-  // Take the inviting player straight to the waiting room
-  // so they are ready when opponent joins
-  mySlot='p1';
+  // Reset state fully then go to waiting room as P1
+  stopTimer();
+  if(roomRef) roomRef.off();
   listenersOn=false;
+  kbBuilt=false;
+  gameState=null;
+  currentWord=[];
+  isSubmitting=false;
+  isMyTurn=false;
+  pendingEndData=null;
+  soloMode=false;
+
+  // myName and myId already set, just update slot/room
+  mySlot='p1';
+  myId=uid(); // fresh id for new game
+  roomId=newRoomId;
+  roomRef=newRoomRef;
+
+  // Update the room with our fresh player info
+  await newRoomRef.update({ p1:{id:myId, name:myName} });
+
   document.getElementById('wait-code').textContent=newRoomId;
   showScreen('waiting');
   listenRoom();
