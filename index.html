@@ -163,9 +163,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 
 #g-wheel-zone{
   flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;padding:4px 8px;min-height:0;
+  justify-content:center;padding:2px 4px;min-height:0;
 }
-#wheel-svg{width:min(220px,52vw);height:min(220px,52vw);}
+#wheel-svg{width:min(280px,72vw);height:min(280px,72vw);}
 #g-msg{
   font-size:12px;font-weight:700;letter-spacing:2px;
   min-height:16px;margin-top:6px;text-align:center;text-transform:uppercase;
@@ -882,6 +882,23 @@ function applyPuzzle(idx){
   OUTER=[...p.outer]; CENTRE=p.centre; POOL=[...OUTER,CENTRE];
 }
 
+function getFreshPuzzleIdx(){
+  // Read recently used puzzles from localStorage (last 8)
+  let recent=[];
+  try{ recent=JSON.parse(localStorage.getItem('wm_recent')||'[]'); }catch(e){}
+  // Build candidate list excluding recent
+  const all=[...Array(PUZZLES.length).keys()];
+  let candidates=all.filter(i=>!recent.includes(i));
+  if(candidates.length===0) candidates=all; // all used — reset
+  // Pick random from candidates
+  const idx=candidates[Math.floor(Math.random()*candidates.length)];
+  // Store it
+  recent.push(idx);
+  if(recent.length>8)recent.shift();
+  try{ localStorage.setItem('wm_recent',JSON.stringify(recent)); }catch(e){}
+  return idx;
+}
+
 function getDailyInfo(){
   const now=new Date();
   const start=new Date(now.getFullYear(),0,0);
@@ -1068,8 +1085,8 @@ async function createRoom(){
   myName=n;myId=uid();mySlot='p1';roomId=mkRoom();
   setLobMsg('Creating room...');
   roomRef=db.ref('rooms/'+roomId);
-  // random puzzle — fair since neither player has seen it yet
-  const puzzleIdx = Math.floor(Math.random() * PUZZLES.length);
+  // random puzzle — avoids recent repeats
+  const puzzleIdx = getFreshPuzzleIdx();
   await roomRef.set({
     created:Date.now(),p1:{id:myId,name:myName},p2:null,
     status:'waiting',round:1,currentTurn:'p1',
@@ -1510,24 +1527,53 @@ function shareRoom(){
   if(navigator.share)navigator.share({title:'Word Muddle',text,url});
   else{navigator.clipboard?.writeText(text);alert('Copied! Send it to your opponent.');}
 }
-function shareResult(){
-  const url=`${location.origin}${location.pathname}`;
+async function shareResult(){
   const iWon=soloMode?true:(gameState&&gameState.loser!==mySlot);
   const round=(gameState?.round||1);
   const winnerName=gameState?.loser==='p1'?gameState?.p2?.name:gameState?.p1?.name;
-  const loserName=gameState?.loser==='p1'?gameState?.p1?.name:gameState?.p2?.name;
-  let msg;
+
   if(soloMode){
+    // Solo — just share the base URL
+    const url=`${location.origin}${location.pathname}`;
     const info=getDailyInfo();
-    msg=`🟩 I played Word Muddle today — Game #${info.gameNum} · ${info.dateStr}\nCan you beat me?`;
-  } else if(iWon){
-    msg=`🏆 I just won Word Muddle in round ${round}! Think you can beat me?\nLet's play!`;
+    const text=`🟩 I played Word Muddle today — Game #${info.gameNum} · ${info.dateStr}\nCan you beat me?\n${url}`;
+    if(navigator.share)navigator.share({title:'Word Muddle',text,url});
+    else{navigator.clipboard?.writeText(text);alert('Link copied!');}
+    return;
+  }
+
+  // Multiplayer — create a fresh room so the challenge link works properly
+  // Winner or loser both get a new room to invite someone into
+  const shareBtn=document.getElementById('res-share-btn');
+  if(shareBtn){shareBtn.textContent='⏳ CREATING ROOM...';shareBtn.style.pointerEvents='none';}
+
+  const newRoomId=mkRoom();
+  const newRoomRef=db.ref('rooms/'+newRoomId);
+  const puzzleIdx=getFreshPuzzleIdx();
+  await newRoomRef.set({
+    created:Date.now(),p1:{id:uid(),name:myName},p2:null,
+    status:'waiting',round:1,currentTurn:'p1',
+    firstRound:true,p1FailedFirst:false,words:[],loser:null,
+    puzzleIdx:puzzleIdx
+  });
+
+  const url=`${location.origin}${location.pathname}#join=${newRoomId}`;
+  let msg;
+  if(iWon){
+    msg=`🏆 I just won Word Muddle in round ${round}! Think you can beat me?\nHey! Fancy a quick game of Word Muddle? 🟩🔤 Click the link now. I'm waiting. ${myName}`;
   } else {
-    msg=`💀 I just got my bum kicked in Word Muddle by ${winnerName||'my opponent'}. I'm looking for redemption. Let's rumble!`;
+    msg=`💀 I just got my bum kicked in Word Muddle by ${winnerName||'my opponent'}. I'm looking for redemption. Let's rumble!\nHey! Fancy a quick game of Word Muddle? 🟩🔤 Click the link now. I'm waiting. ${myName}`;
   }
   const text=`${msg}\n${url}`;
+
+  // Update the waiting room for this player in background
+  // so if someone joins they can play
+  roomId=newRoomId; roomRef=newRoomRef;
+
+  if(shareBtn){shareBtn.textContent=iWon?'🎉  CHALLENGE A FRIEND':'😤  SEEK REDEMPTION — SHARE!';shareBtn.style.pointerEvents='auto';}
+
   if(navigator.share)navigator.share({title:'Word Muddle',text,url});
-  else{navigator.clipboard?.writeText(text);alert('Link copied!');}
+  else{navigator.clipboard?.writeText(text);alert('Copied! Share this link: '+url);}
 }
 
 // ── RESET ─────────────────────────────────────────────────
