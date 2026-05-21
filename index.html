@@ -343,6 +343,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 #challenge-card{border-color:#fed7aa;background:#fff7ed;}
 #challenge-card .mode-arrow{color:#f97316;}
 
+/* ═══ CHALLENGE CREATE BTN ════════════════════════════════ */
+.btn-challenge-create{
+  width:100%;padding:16px;border:none;border-radius:14px;
+  background:var(--or);color:#fff;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;
+  animation:pinkpulse 1.6s ease-in-out infinite;
+  box-shadow:0 4px 20px rgba(249,115,22,.4);
+  margin-bottom:0;
+}
+.btn-challenge-create:active{transform:scale(.97);}
+
 /* ═══ RULES BTN ═══════════════════════════════════════════ */
 #rules-btn{
   background:#fff;border:2px solid var(--border);
@@ -465,20 +476,29 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
   <div id="lob-msg" style="margin-top:8px;max-width:400px;width:100%"></div>
 </div>
 
-<!-- CHALLENGE PANEL (slide-up) -->
-<div id="challenge-panel" style="display:none;position:fixed;inset:0;z-index:75;background:rgba(0,0,0,.5);align-items:flex-end;justify-content:center;">
-  <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#111827;margin-bottom:4px;">CHALLENGE</div>
-    <div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:16px;letter-spacing:.5px;">Create a room and invite a friend — or join theirs</div>
-    <button class="btn-or" style="margin-bottom:10px;" onclick="createRoom()">CREATE ROOM &amp; INVITE</button>
-    <div class="divrow" style="width:100%;margin-bottom:10px">
-      <div class="divline"></div><div class="divtxt">OR JOIN THEIRS</div><div class="divline"></div>
+<!-- CHALLENGE PANEL -->
+<div id="challenge-panel" onclick="panelBackdropTap(event)" style="display:none;position:fixed;inset:0;z-index:75;background:rgba(0,0,0,.55);align-items:flex-end;justify-content:center;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div id="challenge-sheet" style="background:#fff;border-radius:20px 20px 0 0;padding:20px 20px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:480px;flex-shrink:0;">
+    <!-- drag handle -->
+    <div style="width:40px;height:4px;background:#d1d5db;border-radius:2px;margin:0 auto 16px;"></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#111827;margin-bottom:4px;">⚡ CHALLENGE</div>
+    <div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:20px;letter-spacing:.5px;line-height:1.5;">Create a room — share the code with your opponent.<br>Or enter their code to join.</div>
+
+    <!-- BIG PULSING CREATE BUTTON -->
+    <button class="btn-challenge-create" onclick="createRoom()">
+      🎯 CREATE ROOM &amp; INVITE
+    </button>
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#6b7280;text-align:center;margin:6px 0 16px;">TAP TO CREATE · THEN SHARE THE CODE</div>
+
+    <div class="divrow" style="width:100%;margin-bottom:14px">
+      <div class="divline"></div><div class="divtxt">ALREADY HAVE A CODE?</div><div class="divline"></div>
     </div>
     <div class="join-row" style="margin-bottom:16px;">
-      <input id="join-code-panel" class="inp" type="text" placeholder="Room code" maxlength="6" style="text-transform:uppercase;letter-spacing:4px" autocomplete="off"/>
-      <button class="btn-join" onclick="joinRoomFromPanel()">JOIN</button>
+      <input id="join-code-panel" class="inp" type="text" placeholder="Enter room code" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:20px;" autocomplete="off" autocapitalize="characters"/>
+      <button class="btn-join" style="font-size:16px;padding:0 18px;" onclick="joinRoomFromPanel()">JOIN</button>
     </div>
-    <button onclick="closeChallengePanel()" style="width:100%;padding:10px;background:transparent;border:1.5px solid #d1d5db;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#6b7280;cursor:pointer;">CANCEL</button>
+
+    <button onclick="closeChallengePanel()" style="width:100%;padding:12px;background:#f3f4f6;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#6b7280;cursor:pointer;">✕ CANCEL</button>
   </div>
 </div>
 
@@ -890,7 +910,8 @@ function mkRoom(){return Math.random().toString(36).slice(2,8).toUpperCase();}
 function setLobMsg(m){const e=document.getElementById('lob-msg');if(e)e.textContent=m;}
 
 async function createRoom(){
-  const n=document.getElementById('player-name').value.trim();
+  closeChallengePanel();
+  const n=document.getElementById('player-name').value.trim()||myName;
   if(!n){setLobMsg('Enter your name first');return;}
   myName=n;myId=uid();mySlot='p1';roomId=mkRoom();
   setLobMsg('Creating room...');
@@ -1373,13 +1394,31 @@ function playDaily(){
 
 function showChallengePanel(){
   const name=document.getElementById('player-name').value.trim();
-  if(!name){setLobMsg('Enter your name first');return;}
+  if(!name){
+    setLobMsg('Enter your name first ☝️');
+    document.getElementById('player-name').focus();
+    return;
+  }
+  myName=name;
   const p=document.getElementById('challenge-panel');
-  if(p)p.style.display='flex';
+  if(p){
+    p.style.display='flex';
+    // scroll sheet into view on small screens
+    setTimeout(()=>{
+      const sheet=document.getElementById('challenge-sheet');
+      if(sheet)sheet.scrollIntoView({behavior:'smooth',block:'end'});
+    },50);
+  }
+}
+function panelBackdropTap(e){
+  // close if tapped on backdrop (not the sheet itself)
+  if(e.target===document.getElementById('challenge-panel')) closeChallengePanel();
 }
 function closeChallengePanel(){
   const p=document.getElementById('challenge-panel');
   if(p)p.style.display='none';
+  const inp=document.getElementById('join-code-panel');
+  if(inp)inp.value='';
 }
 function joinRoomFromPanel(){
   // copy code from panel input to main join-code input and join
