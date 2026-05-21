@@ -1446,19 +1446,27 @@ function launchFireworks(){
 // ── SHARE ─────────────────────────────────────────────────
 function shareRoom(){
   const url=`${location.origin}${location.pathname}#join=${roomId}`;
-  const text=`Hey! Come and play Wordmuddle with me 🟩🔤\n${url}`;
-  if(navigator.share)navigator.share({title:'Wordmuddle',text,url});
+  const text=`Hey! Fancy a quick game of Word Muddle? 🟩🔤 Click the link now. I'm waiting. ${myName}\n${url}`;
+  if(navigator.share)navigator.share({title:'Word Muddle',text,url});
   else{navigator.clipboard?.writeText(text);alert('Copied! Send it to your opponent.');}
 }
 function shareResult(){
   const url=`${location.origin}${location.pathname}`;
   const iWon=soloMode?true:(gameState&&gameState.loser!==mySlot);
-  const validCount=(gameState?.words||[]).filter(w=>w.valid&&w.slot===mySlot).length;
-  const info=getDailyInfo();
-  const resultEmoji=soloMode?'🟩':iWon?'🏆':'💀';
-  const msg=soloMode?`I found ${validCount} word${validCount!==1?'s':''} in today's Wordmuddle! Game #${info.gameNum} · ${info.dateStr} 🔤\nCan you beat me?`:`${resultEmoji} I played Wordmuddle and ${iWon?'WON':'lost'} with ${validCount} word${validCount!==1?'s':''} 🔤\nThink you can beat me?`;
+  const round=(gameState?.round||1);
+  const winnerName=gameState?.loser==='p1'?gameState?.p2?.name:gameState?.p1?.name;
+  const loserName=gameState?.loser==='p1'?gameState?.p1?.name:gameState?.p2?.name;
+  let msg;
+  if(soloMode){
+    const info=getDailyInfo();
+    msg=`🟩 I played Word Muddle today — Game #${info.gameNum} · ${info.dateStr}\nCan you beat me?`;
+  } else if(iWon){
+    msg=`🏆 I just won Word Muddle in round ${round}! Think you can beat me?\nLet's play!`;
+  } else {
+    msg=`💀 I just got my bum kicked in Word Muddle by ${winnerName||'my opponent'}. I'm looking for redemption. Let's rumble!`;
+  }
   const text=`${msg}\n${url}`;
-  if(navigator.share)navigator.share({title:'Wordmuddle',text,url});
+  if(navigator.share)navigator.share({title:'Word Muddle',text,url});
   else{navigator.clipboard?.writeText(text);alert('Link copied!');}
 }
 
