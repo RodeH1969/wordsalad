@@ -1721,6 +1721,8 @@ function showTurnPopup(lastWord, lastPlayer){
   if(lastWord){
     if(pw)pw.style.display='block';
     if(pv)pv.textContent=lastWord;
+    const lbl=document.getElementById('turn-prev-lbl');
+    if(lbl)lbl.textContent=`${(lastPlayer||'THEY').toUpperCase()} PLAYED`;
     if(title)title.textContent=`${(lastPlayer||'THEIR').toUpperCase()}'S WORD!`;
     if(icon)icon.textContent='🎯';
     if(taunt)taunt.textContent=getRandTaunt();
