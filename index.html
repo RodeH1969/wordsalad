@@ -1137,7 +1137,7 @@ async function createRoom(){
   await roomRef.set({
     created:Date.now(),p1:{id:myId,name:myName},p2:null,
     status:'waiting',round:1,currentTurn:'p1',
-    firstRound:true,p1FailedFirst:false,words:[],loser:null,
+    words:[],loser:null,
     puzzleIdx: puzzleIdx
   });
   document.getElementById('wait-code').textContent=roomId;
@@ -1477,10 +1477,7 @@ async function recordFailure(word){
     return;
   }
   const words=[...(gameState.words||[]),{word,valid:false,player:myName,slot:mySlot}];
-  if(gameState.firstRound&&mySlot==='p1'&&!gameState.p1FailedFirst){
-    await roomRef.update({words,currentTurn:'p2',p1FailedFirst:true});
-    setMsg('P2 GETS A CHANCE','minf'); isSubmitting=false; return;
-  }
+  // Wrong word = instant game over, no second chances
   await roomRef.update({words,status:'finished',loser:mySlot});
 }
 
@@ -1610,7 +1607,7 @@ async function shareResult(){
   await newRoomRef.set({
     created:Date.now(),p1:{id:uid(),name:myName},p2:null,
     status:'waiting',round:1,currentTurn:'p1',
-    firstRound:true,p1FailedFirst:false,words:[],loser:null,
+    words:[],loser:null,
     puzzleIdx:puzzleIdx
   });
 
