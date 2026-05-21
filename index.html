@@ -306,19 +306,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
   height:54px;background:#111827;border-top:3px solid #374151;
   overflow:hidden;display:flex;align-items:center;
 }
-.ticker-track{
+#ticker-track{
   display:flex;align-items:center;
-  /* Two identical copies side by side — scroll left by exactly 50% = one copy width */
-  animation:tickscroll 120s linear infinite;
+  white-space:nowrap;
   will-change:transform;
-  /* width set by JS to 2x content */
+  position:absolute;left:0;top:0;height:100%;
 }
-@keyframes tickscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .ticker-txt{
   font-family:'Barlow Condensed',sans-serif;font-size:22px;
   font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.9);
-  white-space:nowrap;padding:0 6px;line-height:1;
-  display:inline-flex;align-items:center;gap:0;
+  white-space:nowrap;padding:0 8px;line-height:54px;
+  display:inline-flex;align-items:center;
 }
 .ticker-logo{
   height:30px;width:auto;vertical-align:middle;
@@ -476,29 +474,38 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
   <div id="lob-msg" style="margin-top:8px;max-width:400px;width:100%"></div>
 </div>
 
-<!-- CHALLENGE PANEL -->
-<div id="challenge-panel" onclick="panelBackdropTap(event)" style="display:none;position:fixed;inset:0;z-index:75;background:rgba(0,0,0,.55);align-items:flex-end;justify-content:center;overflow-y:auto;-webkit-overflow-scrolling:touch;">
-  <div id="challenge-sheet" style="background:#fff;border-radius:20px 20px 0 0;padding:20px 20px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:480px;flex-shrink:0;">
-    <!-- drag handle -->
-    <div style="width:40px;height:4px;background:#d1d5db;border-radius:2px;margin:0 auto 16px;"></div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#111827;margin-bottom:4px;">⚡ CHALLENGE</div>
-    <div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:20px;letter-spacing:.5px;line-height:1.5;">Create a room — share the code with your opponent.<br>Or enter their code to join.</div>
+<!-- CHALLENGE SCREEN (replaces broken panel) -->
+<div id="challenge-panel" class="screen" style="display:none;">
+  <div style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:14px;">
+    <img src="logo.png" alt="Wordmuddle" style="height:48px;width:auto;object-fit:contain;" onerror="this.style.display='none'"/>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#111827;">⚡ CHALLENGE</div>
+    <div style="font-size:12px;font-weight:600;color:#6b7280;text-align:center;line-height:1.6;letter-spacing:.3px;">
+      Tap below to create a room.<br>A code will appear — share it with your opponent!
+    </div>
 
-    <!-- BIG PULSING CREATE BUTTON -->
     <button class="btn-challenge-create" onclick="createRoom()">
       🎯 CREATE ROOM &amp; INVITE
     </button>
-    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#6b7280;text-align:center;margin:6px 0 16px;">TAP TO CREATE · THEN SHARE THE CODE</div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#9ca3af;text-align:center;">TAP · GET A CODE · SHARE IT</div>
 
-    <div class="divrow" style="width:100%;margin-bottom:14px">
-      <div class="divline"></div><div class="divtxt">ALREADY HAVE A CODE?</div><div class="divline"></div>
-    </div>
-    <div class="join-row" style="margin-bottom:16px;">
-      <input id="join-code-panel" class="inp" type="text" placeholder="Enter room code" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:20px;" autocomplete="off" autocapitalize="characters"/>
-      <button class="btn-join" style="font-size:16px;padding:0 18px;" onclick="joinRoomFromPanel()">JOIN</button>
-    </div>
+    <button onclick="closeChallengePanel()" style="width:100%;padding:12px;background:#f3f4f6;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#6b7280;cursor:pointer;margin-top:4px;">← BACK</button>
+  </div>
+</div>
 
-    <button onclick="closeChallengePanel()" style="width:100%;padding:12px;background:#f3f4f6;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#6b7280;cursor:pointer;">✕ CANCEL</button>
+<!-- JOIN INVITE SCREEN -->
+<div id="join-invite" class="screen">
+  <div style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:16px;">
+    <img src="logo.png" alt="Wordmuddle" style="height:60px;width:auto;object-fit:contain;" onerror="this.style.display='none'"/>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#111827;text-align:center;">YOUR FRIEND IS WAITING!</div>
+    <div style="font-size:13px;font-weight:600;color:#6b7280;text-align:center;line-height:1.6;">Enter your name below<br>then tap JOIN to start playing</div>
+    <div style="width:100%">
+      <span class="lbl">YOUR NAME</span>
+      <input id="invite-name" class="inp" type="text" placeholder="Enter your name" maxlength="16" autocomplete="off" style="font-size:20px;"/>
+    </div>
+    <button id="invite-join-btn" onclick="joinFromInvite()" style="width:100%;padding:16px;border:none;border-radius:14px;background:#ff6b9d;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;cursor:pointer;animation:pinkpulse 1.6s ease-in-out infinite;">
+      JOIN GAME ▶
+    </button>
+    <div id="invite-msg" style="font-size:12px;font-weight:700;color:var(--re);min-height:16px;text-align:center;"></div>
   </div>
 </div>
 
@@ -874,34 +881,31 @@ window.addEventListener('load',()=>{
 // ── SCREENS ───────────────────────────────────────────────
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const el=document.getElementById(id); if(el)el.classList.add('active');
-  // Show rules button always except splash
+  const el=document.getElementById(id);
+  if(el){el.classList.add('active'); el.style.display='flex';}
   const rb=document.getElementById('rules-btn');
-  if(rb)rb.style.display=id==='splash'?'none':'block';
+  if(rb)rb.style.display=(id==='splash')?'none':'block';
 }
 
 // ── JOIN MODE LOBBY (invited player) ──────────────────────
+let pendingJoinCode=null;
 function showLobbyJoinMode(code){
-  showScreen('lobby');
-  // Pre-fill code
+  pendingJoinCode=code;
+  showScreen('join-invite');
+}
+function joinFromInvite(){
+  const name=document.getElementById('invite-name').value.trim();
+  const msg=document.getElementById('invite-msg');
+  if(!name){if(msg)msg.textContent='Enter your name first';return;}
+  if(msg)msg.textContent='';
+  myName=name;
+  // copy into main player-name for joinRoom to use
+  const pn=document.getElementById('player-name');
+  if(pn)pn.value=name;
+  // copy code into join-code
   const jc=document.getElementById('join-code');
-  if(jc)jc.value=code;
-  // Hide create room section, show only join UI
-  const createSection=document.getElementById('create-section');
-  const divSection=document.getElementById('div-section');
-  const joinSection=document.getElementById('join-section');
-  const joinBtn=document.getElementById('join-main-btn');
-  if(createSection)createSection.style.display='none';
-  if(divSection)divSection.style.display='none';
-  // Make join button pulse pink
-  if(joinBtn){
-    joinBtn.className='btn-pink';
-    joinBtn.style.width='100%';
-    joinBtn.style.marginTop='12px';
-  }
-  setLobMsg("Your friend is waiting — enter your name and JOIN! 👇");
-  // Show rules to invited player automatically
-  setTimeout(()=>openRules(true), 600);
+  if(jc)jc.value=pendingJoinCode||'';
+  joinRoom();
 }
 
 // ── ROOM ──────────────────────────────────────────────────
@@ -1400,34 +1404,12 @@ function showChallengePanel(){
     return;
   }
   myName=name;
-  const p=document.getElementById('challenge-panel');
-  if(p){
-    p.style.display='flex';
-    // scroll sheet into view on small screens
-    setTimeout(()=>{
-      const sheet=document.getElementById('challenge-sheet');
-      if(sheet)sheet.scrollIntoView({behavior:'smooth',block:'end'});
-    },50);
-  }
-}
-function panelBackdropTap(e){
-  // close if tapped on backdrop (not the sheet itself)
-  if(e.target===document.getElementById('challenge-panel')) closeChallengePanel();
+  showScreen('challenge-panel');
 }
 function closeChallengePanel(){
-  const p=document.getElementById('challenge-panel');
-  if(p)p.style.display='none';
-  const inp=document.getElementById('join-code-panel');
-  if(inp)inp.value='';
+  showScreen('lobby');
 }
-function joinRoomFromPanel(){
-  // copy code from panel input to main join-code input and join
-  const panelInput=document.getElementById('join-code-panel');
-  const mainInput=document.getElementById('join-code');
-  if(panelInput&&mainInput)mainInput.value=panelInput.value;
-  closeChallengePanel();
-  joinRoom();
-}
+// joinRoomFromPanel removed — join handled via invite link or lobby
 
 // ── RULES ─────────────────────────────────────────────────
 let rulesTimer=null, rulesCdown=null;
@@ -1482,10 +1464,21 @@ function buildTicker(){
   const el=document.getElementById('ticker-track'); if(!el)return;
   el.appendChild(makeTickerContent());
   el.appendChild(makeTickerContent());
+  // RAF scroll — never stops, never flickers
+  let x=0, halfW=0, lastTs=null;
+  function measure(){ halfW=el.scrollWidth/2; }
+  setTimeout(measure,200); setTimeout(measure,1000); setTimeout(measure,3000);
+  function tick(ts){
+    if(lastTs!==null){
+      x -= (ts-lastTs)/1000 * 80;
+      if(halfW>0 && x<=-halfW) x+=halfW;
+      el.style.transform='translateX('+x+'px)';
+    }
+    lastTs=ts;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 }
-
-
-
 
 buildTicker();
 
