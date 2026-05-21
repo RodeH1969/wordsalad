@@ -1450,7 +1450,7 @@ function endGame(d){
     const lp=document.getElementById('lose-popup');
     const ls=document.getElementById('lose-sub');
     if(ls)ls.textContent=`${winnerName} beat you this time.\nFancy a rematch?`;
-    if(lp)lp.classList.add('open');
+    if(lp){lp.style.display=''; lp.classList.add('open');}
     pendingEndData=d;
   } else {
     sfxWin();
@@ -1551,6 +1551,7 @@ async function shareResult(){
   // Winner or loser both get a new room to invite someone into
   const shareBtn=document.getElementById('res-share-btn');
   if(shareBtn){shareBtn.textContent='⏳ CREATING ROOM...';shareBtn.style.pointerEvents='none';}
+  clearAllPopups(); // dismiss any lingering popup immediately on tap
 
   const newRoomId=mkRoom();
   const newRoomRef=db.ref('rooms/'+newRoomId);
@@ -1611,16 +1612,23 @@ async function shareResult(){
 // ── RESET ─────────────────────────────────────────────────
 // ── CLEAR ALL POPUPS ──────────────────────────────────────
 function clearAllPopups(){
-  // Close every popup that might be lingering from previous game
-  const ids=['lose-popup','turn-popup','nicejob-popup','rules-popup'];
+  // Force-close EVERY popup — both class and display style
+  const ids=['lose-popup','turn-popup','nicejob-popup','rules-popup','challenge-panel'];
   ids.forEach(id=>{
     const el=document.getElementById(id);
-    if(el)el.classList.remove('open');
+    if(!el)return;
+    el.classList.remove('open');
+    // For fixed overlays that use display:flex when open, force to none
+    if(id==='lose-popup'||id==='nicejob-popup'||id==='turn-popup'||id==='rules-popup'){
+      el.style.display='none';
+    }
   });
   // Stop any popup timers
   if(turnPopupTimer){clearTimeout(turnPopupTimer);turnPopupTimer=null;}
   if(rulesTimer){clearTimeout(rulesTimer);rulesTimer=null;}
   if(rulesCdown){clearInterval(rulesCdown);rulesCdown=null;}
+  // Also dismiss pending lose flow
+  pendingEndData=null;
 }
 
 // ── LOBBY SETUP ───────────────────────────────────────────
@@ -1778,6 +1786,7 @@ function showTurnPopup(lastWord, lastPlayer){
     if(icon)icon.textContent='⚡';
     if(taunt)taunt.textContent="YOU GO FIRST — SHOW THEM HOW IT'S DONE!";
   }
+  p.style.display='';
   p.classList.add('open');
   if(turnPopupTimer)clearTimeout(turnPopupTimer);
   turnPopupTimer=setTimeout(()=>closeTurnPopup(),4500);
@@ -1790,8 +1799,9 @@ function showNiceJob(playerName, word){
   const wordEl=document.getElementById('nicejob-word');
   if(title)title.textContent=`NICE ONE, ${(playerName||'YOU').toUpperCase()}!`;
   if(wordEl)wordEl.textContent=word;
+  p.style.display='';
   p.classList.add('open');
-  setTimeout(()=>p.classList.remove('open'),2500);
+  setTimeout(()=>{ p.classList.remove('open'); p.style.display='none'; },2500);
 }
 function closeTurnPopup(){
   if(turnPopupTimer){clearTimeout(turnPopupTimer);turnPopupTimer=null;}
