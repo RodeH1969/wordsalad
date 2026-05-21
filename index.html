@@ -396,6 +396,26 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
   0%,100%{box-shadow:0 0 0 0 rgba(255,107,157,.5);border-color:#ff6b9d;}
   50%{box-shadow:0 0 0 10px rgba(255,107,157,0);border-color:#ff3d8a;}
 }
+/* Black variant for invite screen */
+.name-pulse-black{
+  border-color:#111827 !important;background:#f3f4f6 !important;
+  animation:blacknamepulse 1.6s ease-in-out infinite !important;
+}
+.name-pulse-black.focused{
+  animation:none !important;
+  border-color:#111827 !important;
+  background:#f3f4f6 !important;
+  box-shadow:0 0 0 4px rgba(17,24,39,.15) !important;
+}
+@keyframes blacknamepulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(17,24,39,.4);border-color:#111827;}
+  50%{box-shadow:0 0 0 10px rgba(17,24,39,0);border-color:#374151;}
+}
+@keyframes blackpulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(17,24,39,.5);}
+  50%{box-shadow:0 0 0 12px rgba(17,24,39,0);}
+}
+.name-pulse-black .name-pulse-inp::placeholder{color:rgba(17,24,39,.3) !important;}
 .name-pulse-label{
   font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;
   color:#ff6b9d;margin-bottom:8px;text-align:center;
@@ -578,15 +598,26 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
 
 <!-- JOIN INVITE SCREEN -->
 <div id="join-invite" class="screen">
-  <div style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:16px;">
-    <img src="logo.png" alt="Wordmuddle" style="height:60px;width:auto;object-fit:contain;" onerror="this.style.display='none'"/>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#111827;text-align:center;">YOUR FRIEND IS WAITING!</div>
-    <div style="font-size:13px;font-weight:600;color:#6b7280;text-align:center;line-height:1.6;">Enter your name below<br>then tap JOIN to start playing</div>
-    <div style="width:100%">
-      <span class="lbl">YOUR NAME</span>
-      <input id="invite-name" class="inp" type="text" placeholder="Enter your name" maxlength="16" autocomplete="off" style="font-size:20px;"/>
+  <div style="width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:14px;">
+    <img src="logo.png" alt="Wordmuddle" style="height:54px;width:auto;object-fit:contain;" onerror="this.style.display='none'"/>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#111827;text-align:center;line-height:1.1;">YOUR FRIEND<br>IS WAITING!</div>
+
+    <!-- Name entry — black bold pulse (same style as lobby but black) -->
+    <div class="name-pulse-wrap name-pulse-black" style="width:100%"
+         id="invite-name-wrap">
+      <div class="name-pulse-label" style="color:#111827;">👇 ENTER YOUR NAME TO PLAY</div>
+      <input id="invite-name" class="inp name-pulse-inp" type="text"
+        placeholder="Your name..."
+        maxlength="16" autocomplete="off" style="font-size:22px;"
+        onfocus="document.getElementById('invite-name-wrap').classList.add('focused')"
+        onblur="document.getElementById('invite-name-wrap').classList.remove('focused')"/>
     </div>
-    <button id="invite-join-btn" onclick="joinFromInvite()" style="width:100%;padding:16px;border:none;border-radius:14px;background:#ff6b9d;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;cursor:pointer;animation:pinkpulse 1.6s ease-in-out infinite;">
+
+    <button id="invite-join-btn" onclick="joinFromInvite()"
+      style="width:100%;padding:16px;border:none;border-radius:14px;
+             background:#111827;color:#fff;
+             font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;
+             cursor:pointer;animation:blackpulse 1.6s ease-in-out infinite;">
       JOIN GAME ▶
     </button>
     <div id="invite-msg" style="font-size:12px;font-weight:700;color:var(--re);min-height:16px;text-align:center;"></div>
