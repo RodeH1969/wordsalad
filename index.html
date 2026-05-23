@@ -1676,10 +1676,10 @@ async function shareResult(){
   if(navigator.share)navigator.share({title:'Word Muddle',text,url});
   else{navigator.clipboard?.writeText(text);alert('Copied! Share this link: '+url);}
 
-  // Reset state fully then go to waiting room as P1
+  // Tear down old game state cleanly
   stopTimer();
   if(roomRef) roomRef.off();
-  listenersOn=false;
+  listenersOn=false; // must reset BEFORE listenRoom() is called below
   kbBuilt=false;
   gameState=null;
   currentWord=[];
@@ -1688,19 +1688,19 @@ async function shareResult(){
   pendingEndData=null;
   soloMode=false;
 
-  // myName and myId already set, just update slot/room
+  // Set up as P1 of the new room
   mySlot='p1';
-  myId=uid(); // fresh id for new game
+  myId=uid();
   roomId=newRoomId;
   roomRef=newRoomRef;
 
-  // Update the room with our fresh player info
+  // Stamp our fresh id into the room
   await newRoomRef.update({ p1:{id:myId, name:myName} });
 
   clearAllPopups();
   document.getElementById('wait-code').textContent=newRoomId;
   showScreen('waiting');
-  listenRoom();
+  listenRoom(); // listenersOn was false so this will actually attach
 }
 
 // ── RESET ─────────────────────────────────────────────────
@@ -1709,7 +1709,7 @@ function forceCloseAll(){
   // Close result overlay
   hideResult();
   // Close all other popups
-  ['lose-popup','turn-popup','nicejob-popup','rules-popup'].forEach(id=>{
+  ['lose-popup','turn-popup','nicejob-popup','rules-popup','notinlist-popup'].forEach(id=>{
     const el=document.getElementById(id);
     if(el){el.classList.remove('open');el.style.display='none';}
   });
@@ -1720,7 +1720,7 @@ function forceCloseAll(){
 function clearAllPopups(){
   // Force-close EVERY popup — both class and display style
   hideResult();
-  ['lose-popup','turn-popup','nicejob-popup','rules-popup'].forEach(id=>{
+  ['lose-popup','turn-popup','nicejob-popup','rules-popup','notinlist-popup'].forEach(id=>{
     const el=document.getElementById(id);
     if(el){el.classList.remove('open');el.style.display='none';}
   });
