@@ -1915,10 +1915,15 @@ function closeTurnPopup(){
 
 // ── PUZZLE WORD HELPERS ──────────────────────────────────
 function currentPuzzleWords(){
-  // gameState has puzzleIdx when playing; fallback to daily
-  let idx = (gameState&&gameState.puzzleIdx!==undefined) ? gameState.puzzleIdx : null;
-  if(idx===null){ try{ const info=getDailyInfo(); idx=info.puzzleIdx; }catch(e){} }
-  if(idx===null||!PUZZLE_WORDS[idx]) return null;
+  // Try gameState first, then daily info, then match CENTRE letter as fallback
+  let idx = null;
+  if(gameState&&gameState.puzzleIdx!==undefined) idx=gameState.puzzleIdx;
+  if(idx===null){ try{ idx=getDailyInfo().puzzleIdx; }catch(e){} }
+  if(idx===null&&typeof CENTRE!=='undefined'){
+    idx=PUZZLES.findIndex(p=>p.centre===CENTRE);
+    if(idx===-1) idx=null;
+  }
+  if(idx===null||!PUZZLE_WORDS||!PUZZLE_WORDS[idx]) return null;
   return new Set(PUZZLE_WORDS[idx]);
 }
 
