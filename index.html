@@ -687,7 +687,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
         <circle id="t-arc" cx="31" cy="31" r="26" fill="none" stroke="#6aaa64" stroke-width="5"
           stroke-dasharray="163.4" stroke-dashoffset="0" stroke-linecap="round"/>
       </svg>
-      <div class="timer-num" id="t-num" style="color:#111827">40</div>
+      <div class="timer-num" id="t-num" style="color:#111827">30</div>
     </div>
     <div class="g-stat">
       <span class="g-stat-lbl">Words</span>
@@ -929,7 +929,7 @@ const PUZZLE_WORDS = [
 let OUTER=[...PUZZLES[0].outer];
 let CENTRE=PUZZLES[0].centre;
 let POOL=[...OUTER,CENTRE];
-const TURNS=25;
+const TURNS=30;
 
 const TAUNTS=[
   "DON'T BE THE FIRST TO BLINK!",
@@ -1152,7 +1152,35 @@ function joinFromInvite(){
   // copy code into join-code
   const jc=document.getElementById('join-code');
   if(jc)jc.value=pendingJoinCode||'';
-  joinRoom();
+  // Show rules for 10s then auto-join
+  showRulesForInvite(10, ()=>joinRoom());
+}
+
+function showRulesForInvite(secs, cb){
+  const rp=document.getElementById('rules-popup');
+  if(!rp){ cb(); return; }
+  rp.classList.add('open');
+  // Add or update countdown badge
+  let badge=document.getElementById('rules-countdown');
+  if(!badge){
+    badge=document.createElement('div');
+    badge.id='rules-countdown';
+    badge.style.cssText='text-align:center;font-family:"Bebas Neue",sans-serif;font-size:22px;letter-spacing:3px;color:#f97316;margin-top:12px;';
+    rp.querySelector('div').appendChild(badge);
+  }
+  let t=secs;
+  badge.textContent='JOINING IN '+t+'…';
+  const iv=setInterval(()=>{
+    t--;
+    if(t<=0){
+      clearInterval(iv);
+      badge.textContent='';
+      rp.classList.remove('open');
+      cb();
+    } else {
+      badge.textContent='JOINING IN '+t+'…';
+    }
+  },1000);
 }
 
 // ── ROOM ──────────────────────────────────────────────────
